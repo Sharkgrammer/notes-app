@@ -1,0 +1,27 @@
+.text-field {
+    -fx-background-color: transparent;
+    -fx-prompt-text-fill: #444;
+}
+
+.border-main {
+    -fx-border-width: 0.5;
+    -fx-border-color: black;
+}
+
+.text-area {
+    -fx-background-color: transparent;
+    -fx-prompt-text-fill: #444;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+
+
+.text-area .scroll-pane .content{
+    -fx-background-color: transparent;
+}
