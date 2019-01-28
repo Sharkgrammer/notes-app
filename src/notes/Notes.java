@@ -18,7 +18,7 @@ public class Notes extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Database database = new Database();
-        List<Note> noteList = database.retrieveAllNotes(1);
+        List<Note> noteList = database.retrieveAllNotes(user_id);
 
         if (noteList.isEmpty()) {
             makeStage(stage, null, 1);
@@ -34,15 +34,15 @@ public class Notes extends Application {
     void makeStage(Stage stage, Note note, int mode) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
         stage.initStyle(StageStyle.TRANSPARENT);
-        
-        if (mode != 0){
+
+        if (mode != 0) {
             Database database = new Database();
             note.setId(database.addNote(user_id, "", "", 1));
         }
-        
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         stage.setScene(new Scene((Parent) loader.load()));
-        
+
         mainController controller = loader.<mainController>getController();
         controller.start(note, stage);
 

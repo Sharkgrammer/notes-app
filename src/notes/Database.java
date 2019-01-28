@@ -44,7 +44,7 @@ public class Database {
 
         return noteList;
     }
-    
+
     public boolean deleteNote(int ID) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -58,10 +58,10 @@ public class Database {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-        
+
         return response.equals("deleted");
     }
-    
+
     public int addNote(int user_id, String title, String content, int type) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -81,10 +81,10 @@ public class Database {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-        
+
         return Integer.valueOf(response);
     }
-    
+
     public void updateNote(Note note) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -153,9 +153,9 @@ public class Database {
     }
 
     private String sendGet(List<String> parms) throws Exception {
-        
+
         String url = "http://pokergamelabs.gearhostpreview.com/notes?";
-        
+
         String urlParameters = "";
 
         for (int x = 0; x < parms.size(); x += 2) {
@@ -164,11 +164,11 @@ public class Database {
             }
             urlParameters += parms.get(x) + "=" + parms.get(x + 1);
         }
-        
+
         url += urlParameters;
 
         System.out.println(url);
-        
+
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 

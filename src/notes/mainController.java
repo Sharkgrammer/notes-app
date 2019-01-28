@@ -6,6 +6,8 @@ import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -60,9 +62,20 @@ public class mainController implements Initializable {
         this.stage = stage;
         randomLocation();
         titleDrag();
+        stage.setAlwaysOnTop(true);
         titleText.setText(note.getTitle());
         contentText.setText(note.getContent());
         contentText.requestFocus();
+
+        stage.iconifiedProperty().addListener(new ChangeListener<Boolean>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean value) {
+                if (!value){
+                    stage.setAlwaysOnTop(true);
+                }
+            }
+        });
     }
 
     public void randomLocation() {
@@ -96,24 +109,30 @@ public class mainController implements Initializable {
 
     @FXML
     private void exit(MouseEvent event) {
-        ButtonType Yes = new ButtonType("Yes");
-        ButtonType No = new ButtonType("No");
-        ButtonType Hide = new ButtonType("Hide");
-        Alert alert = new Alert(AlertType.NONE, "Do you want to delete your note: '" + note.getTitle() + "'?", Yes, No, Hide);
+        ButtonType Delete = new ButtonType("Delete");
+        ButtonType Hide = new ButtonType("Close");
+        ButtonType Min = new ButtonType("Minimise");
+        ButtonType Not = new ButtonType("Nothing");
+        Alert alert = new Alert(AlertType.NONE, "Exit Options for: '" + note.getTitle() + "'?", Delete, Hide, Min, Not);
         alert.setX(stage.getX() - 50);
         alert.setY(stage.getY() + 80);
         alert.initStyle(StageStyle.UNDECORATED);
-        
+        stage.setAlwaysOnTop(false);
+
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.orElse(No) == Yes) {
+        if (result.orElse(Not) == Delete) {
             System.out.println("Exit clicked: Delete");
             database.deleteNote(note.getId());
             stage.close();
-        }else if (result.orElse(No) == Hide) {
-            System.out.println("Exit clicked: Hide");
+        } else if (result.orElse(Not) == Hide) {
+            System.out.println("Exit clicked: Close");
             stage.close();
-        }else{
-            System.out.println("Exit clicked: No");
+        } else if (result.orElse(Not) == Min) {
+            System.out.println("Exit clicked: Minimise");
+            stage.setIconified(true);
+        } else {
+            System.out.println("Exit clicked: Nothing");
+            stage.setAlwaysOnTop(true);
         }
     }
 
