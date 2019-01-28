@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -77,11 +79,19 @@ public class mainController implements Initializable {
     @FXML
     private void add(MouseEvent event) {
         System.out.println("Add clicked");
+        try {
+            (new Notes()).makeStage(new Stage(), new Note(), 1);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
     }
 
     @FXML
     private void option(MouseEvent event) {
         System.out.println("Option clicked");
+        note.setContent(contentText.getText());
+        note.setTitle(titleText.getText());
+        database.updateNote(note);
     }
 
     @FXML

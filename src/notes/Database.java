@@ -61,6 +61,49 @@ public class Database {
         
         return response.equals("deleted");
     }
+    
+    public int addNote(int user_id, String title, String content, int type) {
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("3");
+        parms.add("ID");
+        parms.add(String.valueOf(user_id));
+        parms.add("title");
+        parms.add(title.replace(" ", "---"));
+        parms.add("content");
+        parms.add(content.replace(" ", "---"));
+        parms.add("ntype");
+        parms.add(String.valueOf(type));
+        String response = "";
+        try {
+            //response = sendPost(parms);
+            response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+        
+        return Integer.valueOf(response);
+    }
+    
+    public void updateNote(Note note) {
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("6");
+        parms.add("ID");
+        parms.add(String.valueOf(note.getId()));
+        parms.add("title");
+        parms.add(note.getTitle().replace(" ", "---"));
+        parms.add("content");
+        parms.add(note.getContent().replace(" ", "---"));
+        parms.add("ntype");
+        parms.add(String.valueOf(note.getType()));
+        try {
+            //response = sendPost(parms);
+            sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+    }
 
     private String sendPost(List<String> parms) throws Exception {
 

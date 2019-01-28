@@ -130,16 +130,23 @@ if ($type == 1){
 	mysqli_query($con, $query) or die(mysqli_error($con));
 	echo "Table Updated";
 }elseif($type == 3){
-	$id = $con->real_escape_string(htmlspecialchars($_GET['id']));
+	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
 	$title = $con->real_escape_string(htmlspecialchars($_GET['title']));
+	$title = str_replace("---", " ", $title);
 	$content = $con->real_escape_string(htmlspecialchars($_GET['content']));
-	$type = $con->real_escape_string(htmlspecialchars($_GET['type']));
+	$content = str_replace("---", " ", $content);
+	$type = $con->real_escape_string(htmlspecialchars($_GET['ntype']));
 	
 	$query = "insert into note (user_id, note_title, note_content, note_date, note_type)
 	values('$id', '$title', '$content', NOW(), '$type');";
 	mysqli_query($con, $query) or die(mysqli_error($con));
 	
-	echo "Table Updated";
+	$query3 = "select MAX(note_id) from note";
+	$result3 = mysqli_query($con, $query3) or die(mysqli_error($con));	
+	$row3 = mysqli_fetch_assoc($result3);
+	$num = $row3['MAX(note_id)'];
+	
+	echo $num;
 }elseif($type == 4){
 	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
 	$query = "select * from note where user_id = '$id' order by note_id";
@@ -179,7 +186,18 @@ if ($type == 1){
 	$query = "delete from note where note_id = '$id'";
 	mysqli_query($con, $query) or die(mysqli_error($con));
 	
-	echo "deleted";		
+	echo "deleted";	
+}elseif($type == 6){
+	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
+	$title = $con->real_escape_string(htmlspecialchars($_GET['title']));
+	$title = str_replace("---", " ", $title);
+	$content = $con->real_escape_string(htmlspecialchars($_GET['content']));
+	$content = str_replace("---", " ", $content);
+	$type = $con->real_escape_string(htmlspecialchars($_GET['ntype']));
+	
+	$query = "update note set note_title = '$title', 
+	note_content = '$content', note_type = '$type' where note_id = '$id'";
+	mysqli_query($con, $query) or die(mysqli_error($con));
 }else{
 	echo "Error 404: Error not found";
 }

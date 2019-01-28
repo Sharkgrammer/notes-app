@@ -23,9 +23,9 @@
             </Pane>
             <Pane fx:id="optionPane" layoutX="237.0" layoutY="15.0" maxHeight="26.0" maxWidth="30.0" onMouseClicked="#option" prefHeight="26.0" prefWidth="30.0">
                <children>
-                  <ImageView fx:id="option" fitHeight="11.0" fitWidth="26.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="option" fitHeight="25.0" fitWidth="19.0" layoutX="-9.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../assets/optionBlack.png" />
+                        <Image url="@../assets/saveBlack.png" />
                      </image>
                   </ImageView>
                </children>

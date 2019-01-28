@@ -1,7 +1,6 @@
 package notes;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,7 +11,7 @@ import javafx.stage.StageStyle;
 
 public class Notes extends Application {
 
-    int user_id;
+    int user_id = 1;
     String email;
     String key;
 
@@ -22,19 +21,24 @@ public class Notes extends Application {
         List<Note> noteList = database.retrieveAllNotes(1);
 
         if (noteList.isEmpty()) {
-            makeStage(stage, null);
+            makeStage(stage, null, 1);
         } else {
             for (Note note : noteList) {
                 stage = new Stage();
-                makeStage(stage, note);
+                makeStage(stage, note, 0);
             }
         }
 
     }
 
-    void makeStage(Stage stage, Note note) throws Exception {
+    void makeStage(Stage stage, Note note, int mode) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
         stage.initStyle(StageStyle.TRANSPARENT);
+        
+        if (mode != 0){
+            Database database = new Database();
+            note.setId(database.addNote(user_id, "", "", 1));
+        }
         
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         stage.setScene(new Scene((Parent) loader.load()));
