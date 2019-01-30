@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layNoteItem"
+    android:layout_width="match_parent"
+    android:padding="5dp"
+    android:background="@color/botColour"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/noteid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="5dp"
+        tools:layout_editor_absoluteY="5dp" />
+
+    <LinearLayout
+        android:background="@drawable/shadowbg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/noteTitle"
+            android:layout_width="wrap_content"
+            android:textColor="@color/textColour"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Note Title"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/noteDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColour"
+            android:layout_weight="1"
+            android:text="Note Date"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
