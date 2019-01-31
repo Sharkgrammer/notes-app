@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     }
 
     public void add(View v) {
-        //System.out.println("Add clicked");
         try {
             Intent i = new Intent(MainActivity.this, NoteActivity.class);
 
