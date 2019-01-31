@@ -72,6 +72,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
 
     @Override
     public void onBackPressed() {
+        option(null);
         startActivity(new Intent(NoteActivity.this, MainActivity.class));
     }
 

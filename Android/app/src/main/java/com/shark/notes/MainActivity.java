@@ -63,9 +63,25 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    layNotes.addView(Child, pi - 1);
+                    layNotes.addView(Child, pi);
                 }
             });
+        }
+    }
+
+    public void add(View v) {
+        //System.out.println("Add clicked");
+        try {
+            Intent i = new Intent(MainActivity.this, NoteActivity.class);
+
+            i.putExtra("noteTitle", "");
+            i.putExtra("noteContent", "");
+            i.putExtra("noteID", String.valueOf(database.addNote(user_id, "", "", 1)));
+            i.putExtra("noteUser", String.valueOf(1));
+
+            startActivity(i);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
         }
     }
 
