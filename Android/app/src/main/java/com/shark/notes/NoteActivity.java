@@ -47,7 +47,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         title.setText(note.getTitle());
         content.setText(note.getContent());
 
-        title.addTextChangedListener(new TextWatcher() {
+        TextWatcher savedSet = new TextWatcher() {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -63,25 +63,10 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
             public void afterTextChanged(Editable s) {
 
             }
-        });
+        };
 
-        content.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                saved = false;
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        title.addTextChangedListener(savedSet);
+        content.addTextChangedListener(savedSet);
     }
 
     public void add(View v) {

@@ -42,7 +42,7 @@
             <TextField fx:id="titleText" layoutX="47.0" layoutY="13.0" prefHeight="25.0" prefWidth="174.0" promptText="Title here..." stylesheets="@../css/main.css" />
          </children>
       </Pane>
-      <TextArea fx:id="contentText" layoutX="5.0" layoutY="54.0" prefHeight="240.0" prefWidth="290.0" promptText="Type here..." stylesheets="@../css/main.css">
+      <TextArea fx:id="contentText" layoutY="50.0" prefHeight="250.0" prefWidth="300.0" promptText="Type here..." stylesheets="@../css/main.css">
          <styleClass>
             <String fx:value="text-area" />
             <String fx:value="content" />

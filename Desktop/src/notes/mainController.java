@@ -31,7 +31,8 @@ public class mainController implements Initializable {
     Note note;
     Stage stage;
     Database database;
-    private double sceneX, sceneY, alertX, alertY;;
+    private double sceneX, sceneY, alertX, alertY;
+    boolean saved = true;
 
     @FXML
     private ImageView exit;
@@ -66,14 +67,18 @@ public class mainController implements Initializable {
         titleText.setText(note.getTitle());
         contentText.setText(note.getContent());
         contentText.requestFocus();
+        contentText.wrapTextProperty().set(true);
 
-        stage.iconifiedProperty().addListener(new ChangeListener<Boolean>() {
+        ChangeListener savedSet = (ChangeListener<String>) (ObservableValue<? extends String> observableValue, String s, String s2) -> {
+            saved = false;
+        };
 
-            @Override
-            public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean value) {
-                if (!value){
-                    stage.setAlwaysOnTop(true);
-                }
+        contentText.textProperty().addListener(savedSet);
+        titleText.textProperty().addListener(savedSet);
+
+        stage.iconifiedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean t, Boolean value) -> {
+            if (!value) {
+                stage.setAlwaysOnTop(true);
             }
         });
     }
@@ -105,6 +110,7 @@ public class mainController implements Initializable {
         note.setContent(contentText.getText());
         note.setTitle(titleText.getText());
         database.updateNote(note);
+        saved = true;
     }
 
     @FXML
@@ -118,7 +124,7 @@ public class mainController implements Initializable {
         alert.setY(stage.getY() + 80);
         alert.initStyle(StageStyle.UNDECORATED);
         stage.setAlwaysOnTop(false);
-        
+
         alert.getDialogPane().setOnMousePressed((MouseEvent mouseEvent) -> {
             alertX = alert.getX() - mouseEvent.getScreenX();
             alertY = alert.getY() - mouseEvent.getScreenY();
@@ -141,8 +147,14 @@ public class mainController implements Initializable {
             stage.close();
         } else if (result.orElse(Not) == Hide) {
             //System.out.println("Exit clicked: Close");
+            if (!saved) {
+                option(null);
+            }
             stage.close();
         } else if (result.orElse(Not) == Min) {
+            if (!saved) {
+                option(null);
+            }
             //System.out.println("Exit clicked: Minimise");
             stage.setIconified(true);
         } else {
@@ -167,6 +179,5 @@ public class mainController implements Initializable {
             stage.setY(mouseEvent.getScreenY() + sceneY);
         });
     }
-    
 
 }
