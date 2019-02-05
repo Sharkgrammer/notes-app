@@ -26,7 +26,11 @@ public class Database {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-
+        
+        if (response.equals("Error")){
+            return noteList;
+        }
+        
         Note note;
         for (String noteStr : response.split(";")) {
             note = new Note();

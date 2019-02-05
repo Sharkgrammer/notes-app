@@ -21,7 +21,7 @@ public class Notes extends Application {
         List<Note> noteList = database.retrieveAllNotes(user_id);
 
         if (noteList.isEmpty()) {
-            makeStage(stage, null, 1);
+            makeStage(stage, new Note(), 1);
         } else {
             for (Note note : noteList) {
                 stage = new Stage();

@@ -30,7 +30,12 @@ public class Database {
             System.out.println(ex.toString());
         }
 
+        if (response.equals("Error")){
+            return noteList;
+        }
+
         Note note; int noteid = 0;
+
         for (String noteStr : response.split(";")) {
             note = new Note();
             note.setList_id(noteid++);
