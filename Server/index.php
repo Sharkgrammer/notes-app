@@ -49,8 +49,8 @@ function generateRandomString($length) {
 }
 
 $dbstring = $_GET['key'];
-$auth_key = explode(",", $dbstring)[1];
-$user_id = explode(",", $dbstring)[0];
+$auth_key = explode(";", $dbstring)[1];
+$user_id = explode(";", $dbstring)[0];
 
 $type = $_GET['type'];
 
@@ -110,9 +110,7 @@ if ($type == 1){
 					mysqli_query($con, $query2) or die("Error");
 					
 					echo $row['user_id'];
-					echo "---";
-					echo $row['user_name'];
-					echo "---";
+					echo ";";
 					echo $key_string;
 				}
 			}
@@ -121,8 +119,8 @@ if ($type == 1){
 		echo "Error";
 	}
 }elseif($type == 2){
-	$user_email = $con->real_escape_string(htmlspecialchars($_GET['emai']));
-	$user_pass = $con->real_escape_string(htmlspecialchars($_GET['pass']));
+	$user_email = $con->real_escape_string(htmlspecialchars($_GET['username']));
+	$user_pass = $con->real_escape_string(htmlspecialchars($_GET['password']));
 	$hashed_password = password_hash($user_pass, PASSWORD_DEFAULT);
 	
 	$query = "insert into users (user_email, user_pass)

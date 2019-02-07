@@ -26,7 +26,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
-        database = new Database();
+        database = new Database(this);
         add = findViewById(R.id.Add);
         save = findViewById(R.id.Save);
         del = findViewById(R.id.Exit);

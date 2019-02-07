@@ -1,6 +1,10 @@
 package com.shark.notes;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -12,8 +16,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
+    private String key = "0";
 
-    private final String USER_AGENT = "Mozilla/5.0";
+    Database(Context context){
+        key = context.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
+    }
+
+    public String login(String email, String password){
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("1");
+        parms.add("username");
+        parms.add(email);
+        parms.add("password");
+        parms.add(password);
+        String response = "";
+        try {
+            //response = sendPost(parms);
+            response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        System.out.println("Login");
+        return response;
+    }
+
+    public boolean register(String email, String password){
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("2");
+        parms.add("username");
+        parms.add(email);
+        parms.add("password");
+        parms.add(password);
+        String response = "";
+        try {
+            //response = sendPost(parms);
+            response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        System.out.println("Registered");
+        return response.equals("Table Updated");
+    }
 
     public List<Note> retrieveAllNotes(int ID) {
         List<Note> noteList = new ArrayList<>();
@@ -119,7 +166,8 @@ public class Database {
     }
 
     private String sendGet(List<String> parms) throws Exception {
-
+        parms.add("key");
+        parms.add(key);
         String url = "http://pokergamelabs.gearhostpreview.com/notes?";
 
         String urlParameters = "";

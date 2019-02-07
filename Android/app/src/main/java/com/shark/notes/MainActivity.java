@@ -1,8 +1,10 @@
 package com.shark.notes;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -15,7 +17,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements Serializable {
 
     List<Note> notes;
-    int user_id = 1;
+    int user_id = 0;
+    String user_key = "";
     LinearLayout layNotes;
     int pi = 0;
     Note note;
@@ -27,11 +30,20 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        database = new Database();
-        notes = database.retrieveAllNotes(user_id);
-        layNotes = findViewById(R.id.layNote);
+        String Key = this.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
+        if (Key.equals("0")) {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+        }else{
+            Log.wtf("huh", Key);
+            user_id = Integer.parseInt(Key.split(";")[0]);
 
-        LoadNotes();
+            database = new Database(this);
+            notes = database.retrieveAllNotes(user_id);
+            layNotes = findViewById(R.id.layNote);
+
+            LoadNotes();
+        }
     }
 
     void NoteClicked(String ID) {
