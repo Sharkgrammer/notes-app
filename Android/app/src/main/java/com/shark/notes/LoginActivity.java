@@ -21,7 +21,7 @@ public class LoginActivity extends AppCompatActivity {
         final TextView txtPassword = findViewById(R.id.logPass);
         Button login = findViewById(R.id.logLog);
         Button register = findViewById(R.id.logReg);
-        final Database database = new Database();
+        final Database database = new Database(this);
         login.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick (View view) {

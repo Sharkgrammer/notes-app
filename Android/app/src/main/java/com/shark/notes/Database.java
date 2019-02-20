@@ -11,7 +11,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,26 +81,27 @@ public class Database {
             System.out.println(ex.toString());
         }
 
-        if (response.equals("Error")){
+        if (response.equals("Error")) {
             return noteList;
         }
 
         Note note; int noteid = 0;
-
-        for (String noteStr : response.split(";")) {
+        //System.out.println(response);
+        for (String noteStr : response.split("/split2/")) {
             note = new Note();
+            String[] noteArr = noteStr.split("/split1/");
             note.setList_id(noteid++);
-            note.setId(Integer.valueOf(noteStr.split("---")[0]));
-            note.setUser_id(Integer.valueOf(noteStr.split("---")[1]));
-            note.setTitle(noteStr.split("---")[2].replace("@@@", "\n"));
-            note.setContent(noteStr.split("---")[3].replace("@@@", "\n"));
-            note.setDate(toVisualDate(noteStr.split("---")[4], "-"));
-            note.setType(Integer.valueOf(noteStr.split("---")[5]));
+            note.setId(Integer.valueOf(noteArr[0]));
+            note.setUser_id(Integer.valueOf(noteArr[1]));
+            note.setTitle(noteArr[2]);
+            note.setContent(noteArr[3].replace("/para/", "\n"));
+            note.setDate(noteArr[4]);
+            note.setType(Integer.valueOf(noteArr[5]));
 
             noteList.add(note);
         }
 
-        System.out.println("Notes recieved");
+        System.out.println("Notes Recieved");
 
         return noteList;
     }
@@ -110,7 +115,7 @@ public class Database {
         String response = "";
         try {
             //response = sendPost(parms);
-            response = sendGet(parms);
+            sendPost(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -126,15 +131,15 @@ public class Database {
         parms.add("ID");
         parms.add(String.valueOf(user_id));
         parms.add("title");
-        parms.add(title.replace(" ", "---").replace("\n", "@@@"));
+        parms.add(title);
         parms.add("content");
-        parms.add(content.replace(" ", "---").replace("\n", "@@@"));
+        parms.add(content);
         parms.add("ntype");
         parms.add(String.valueOf(type));
         String response = "";
         try {
-            //response = sendPost(parms);
-            response = sendGet(parms);
+            response = sendPost(parms);
+            //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -150,14 +155,14 @@ public class Database {
         parms.add("ID");
         parms.add(String.valueOf(note.getId()));
         parms.add("title");
-        parms.add(note.getTitle().replace(" ", "---").replace("\n", "@@@"));
+        parms.add(note.getTitle());
         parms.add("content");
-        parms.add(note.getContent().replace(" ", "---").replace("\n", "@@@"));
+        parms.add(note.getContent());
         parms.add("ntype");
         parms.add(String.valueOf(note.getType()));
         try {
             //response = sendPost(parms);
-            sendGet(parms);
+            sendPost(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -168,7 +173,7 @@ public class Database {
     private String sendGet(List<String> parms) throws Exception {
         parms.add("key");
         parms.add(key);
-        String url = "http://pokergamelabs.gearhostpreview.com/notes?";
+        String url = "http://notesapp.gearhostpreview.com?";
 
         String urlParameters = "";
 
@@ -180,7 +185,24 @@ public class Database {
         }
         url += urlParameters;
 
-        return new Fetcher().execute(url).get();
+        return new Fetcher().execute(url, "0").get();
+    }
+
+    private String sendPost(List<String> parms) throws Exception {
+        parms.add("key");
+        parms.add(key);
+
+        String url = "http://notesapp.gearhostpreview.com";
+        String data = "";
+
+        for (int x = 0; x < parms.size(); x += 2) {
+            if (x != 0) {
+                data += "&";
+            }
+            data += URLEncoder.encode(parms.get(x), "UTF-8") + "=" + URLEncoder.encode(parms.get(x + 1), "UTF-8");
+        }
+
+        return new Fetcher().execute(url, data).get();
     }
 
     private String toVisualDate(String date, String s) {
@@ -202,20 +224,49 @@ class Fetcher extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... args) {
         String link = args[0];
-        try{
-            HttpClient client = new DefaultHttpClient();
-            HttpGet request = new HttpGet();
-            request.setURI(new URI(link));
-            HttpResponse response = client.execute(request);
-            BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-            String Boop = in.readLine();//.substring(1);
-            in.close();
-            if (Boop.equals("Error")){
-                return "Error";
+        String postData = args[1];
+
+        if (!postData.equals("0")){
+            try{
+                URL url = new URL(link);
+                System.out.println(postData);
+                URLConnection conn = url.openConnection();
+                conn.setDoOutput(true);
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(postData);
+                wr.flush();
+
+                BufferedReader reader = null;
+                StringBuilder response = new StringBuilder();
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String line = null;
+
+                // Read Server Response
+                while ((line = reader.readLine()) != null) {
+                    // Append server response in string
+                    response.append(line);
+                }
+                return response.toString().replace("\"", "");
+            }catch (Exception ex){
+                System.out.println(ex.toString());
+                return ex.toString();
             }
-            return Boop;
-        }catch (Exception ex){
-            return ex.toString();
+        }else{
+            try{
+                HttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                request.setURI(new URI(link));
+                HttpResponse response = client.execute(request);
+                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                String Boop = in.readLine();//.substring(1);
+                in.close();
+                if (Boop.equals("Error")){
+                    return "Error";
+                }
+                return Boop;
+            }catch (Exception ex){
+                return ex.toString();
+            }
         }
     }
 

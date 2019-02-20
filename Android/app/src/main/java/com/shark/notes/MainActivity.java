@@ -31,11 +31,14 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         setContentView(R.layout.activity_main);
 
         String Key = this.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
+
+        Key = "1;bees";
+
         if (Key.equals("0")) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }else{
-            Log.wtf("huh", Key);
+            //Log.wtf("huh", Key);
             user_id = Integer.parseInt(Key.split(";")[0]);
 
             database = new Database(this);
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
     void NoteClicked(String ID) {
         Note note = notes.get(Integer.valueOf(ID));
+        System.out.println(ID);
         Intent i = new Intent(MainActivity.this, NoteActivity.class);
         i.putExtra("noteTitle", note.getTitle());
         i.putExtra("noteContent", note.getContent());
