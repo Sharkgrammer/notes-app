@@ -40,7 +40,7 @@ public class Note {
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.title = htmlParser(title);
     }
 
     public String getContent() {
@@ -48,7 +48,7 @@ public class Note {
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.content = htmlParser(content);
     }
 
     public String getDate() {
@@ -74,5 +74,33 @@ public class Note {
 
     public void setList_id(int list_id) {
         this.list_id = list_id;
+    }
+
+    private String htmlParser(String text) {
+        String[] textArr = text.split("&");
+        for (String x : textArr) {
+            try{
+                x = x.split(";")[0];
+                switch (x) {
+                    case "amp":
+                        text = text.replace("&amp;", "&");
+                        break;
+                    case "quot":
+                        text = text.replace("&quot;", "\"");
+                        break;
+                    case "lt":
+                        text = text.replace("&lt;", "<");
+                        break;
+                    case "gt":
+                        text = text.replace("&gt;", ">");
+                        break;
+                }
+                textArr = text.split("@");
+            }catch(Exception e){
+                //
+            }
+        }
+
+        return text;
     }
 }

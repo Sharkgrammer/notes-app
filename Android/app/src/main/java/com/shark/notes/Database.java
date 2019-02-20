@@ -95,7 +95,7 @@ public class Database {
             note.setUser_id(Integer.valueOf(noteArr[1]));
             note.setTitle(noteArr[2]);
             note.setContent(noteArr[3].replace("/para/", "\n"));
-            note.setDate(noteArr[4]);
+            note.setDate(toVisualDate(noteArr[4], "-"));
             note.setType(Integer.valueOf(noteArr[5]));
 
             noteList.add(note);
