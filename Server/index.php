@@ -49,10 +49,17 @@ function generateRandomString($length) {
 }
 
 $dbstring = $_GET['key'];
+if (strlen($dbstring) < 1){
+	$dbstring = $_POST['key'];
+}
+
 $auth_key = explode(";", $dbstring)[1];
 $user_id = explode(";", $dbstring)[0];
 
 $type = $_GET['type'];
+if (strlen($type) < 1){
+	$type = $_POST['type'];
+}
 
 //keys are checked here
 if($type > 2){
@@ -81,8 +88,8 @@ if($type > 2){
 
 if ($type == 1){
 	//Login function
-	$username = $con->real_escape_string(htmlspecialchars($_GET['username']));
-	$password = $con->real_escape_string(htmlspecialchars($_GET['password']));
+	$username = $con->real_escape_string(htmlspecialchars($_POST['username']));
+	$password = $con->real_escape_string(htmlspecialchars($_POST['password']));
 	$query2 = "select user_pass from users where user_email = '$username';";
 	$result2 = mysqli_query($con, $query2) or die(mysqli_error($con));	
 	$row2 = mysqli_fetch_assoc($result2);
@@ -119,8 +126,8 @@ if ($type == 1){
 		echo "Error";
 	}
 }elseif($type == 2){
-	$user_email = $con->real_escape_string(htmlspecialchars($_GET['username']));
-	$user_pass = $con->real_escape_string(htmlspecialchars($_GET['password']));
+	$user_email = $con->real_escape_string(htmlspecialchars($_POST['username']));
+	$user_pass = $con->real_escape_string(htmlspecialchars($_POST['password']));
 	$hashed_password = password_hash($user_pass, PASSWORD_DEFAULT);
 	
 	$query = "insert into users (user_email, user_pass)
@@ -128,13 +135,11 @@ if ($type == 1){
 	mysqli_query($con, $query) or die(mysqli_error($con));
 	echo "Table Updated";
 }elseif($type == 3){
-	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
-	$title = $con->real_escape_string(htmlspecialchars($_GET['title']));
-	$title = str_replace("---", " ", $title);
-	$content = $con->real_escape_string(htmlspecialchars($_GET['content']));
-	$content = str_replace("---", " ", $content);
-	$type = $con->real_escape_string(htmlspecialchars($_GET['ntype']));
-	
+	$id = $con->real_escape_string(htmlspecialchars($_POST['ID']));
+	$title = $con->real_escape_string(htmlspecialchars($_POST['title']));
+	$content = $con->real_escape_string(htmlspecialchars($_POST['content']));
+	$content = str_replace("\\n", "/para/", $content);
+	$type = $con->real_escape_string(htmlspecialchars($_POST['ntype']));
 	$query = "insert into note (user_id, note_title, note_content, note_date, note_type)
 	values('$id', '$title', '$content', NOW(), '$type');";
 	mysqli_query($con, $query) or die(mysqli_error($con));
@@ -165,34 +170,33 @@ if ($type == 1){
 			while($row = mysqli_fetch_assoc($result))
 			{
 				echo $row['note_id'];
-				echo "---";
+				echo "/split1/";
 				echo $row['user_id'];
-				echo "---";
+				echo "/split1/";
 				echo $row['note_title'];
-				echo "---";
+				echo "/split1/";
 				echo $row['note_content'];
-				echo "---";
+				echo "/split1/";
 				echo $row['note_date'];
-				echo "---";
+				echo "/split1/";
 				echo $row['note_type'];
-				echo ";";
+				echo "/split2/";
 			}
 		}
 	}
 }elseif($type == 5){
-	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
+	$id = $con->real_escape_string(htmlspecialchars($_POST['ID']));
 	$query = "delete from note where note_id = '$id'";
 	mysqli_query($con, $query) or die(mysqli_error($con));
 	
 	echo "deleted";	
 }elseif($type == 6){
-	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
-	$title = $con->real_escape_string(htmlspecialchars($_GET['title']));
-	$title = str_replace("---", " ", $title);
-	$content = $con->real_escape_string(htmlspecialchars($_GET['content']));
-	$content = str_replace("---", " ", $content);
-	$type = $con->real_escape_string(htmlspecialchars($_GET['ntype']));
-	
+	$id = $con->real_escape_string(htmlspecialchars($_POST['ID']));
+	$title = $con->real_escape_string(htmlspecialchars($_POST['title']));
+	$content = $con->real_escape_string(htmlspecialchars($_POST['content']));
+	$content = str_replace("\\n", "/para/", $content);
+	echo $content;
+	$type = $con->real_escape_string(htmlspecialchars($_POST['ntype']));
 	$query = "update note set note_title = '$title', 
 	note_content = '$content', note_type = '$type' where note_id = '$id'";
 	mysqli_query($con, $query) or die(mysqli_error($con));

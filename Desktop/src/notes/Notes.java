@@ -28,7 +28,6 @@ public class Notes extends Application {
                 makeStage(stage, note, 0);
             }
         }
-
     }
 
     void makeStage(Stage stage, Note note, int mode) throws Exception {
