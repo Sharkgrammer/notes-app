@@ -29,3 +29,9 @@
 .text-area .scroll-bar {
     -fx-opacity: 0;
 }
+
+.rounded {
+  -fx-border-radius: 50;
+  -fx-background-radius: 50;
+  -fx-background-color: #ffca00ff;
+}

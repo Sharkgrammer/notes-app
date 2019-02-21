@@ -1,18 +1,16 @@
 package notes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Note {
 
     private int id;
     private int user_id;
+    private int list_id;
     private String title;
     private String content;
     private String date;
     private int type;
 
-    public Note() {
+    public Note(){
         id = 0;
         user_id = 0;
         title = "";
@@ -69,6 +67,15 @@ public class Note {
         this.type = type;
     }
 
+
+    public int getList_id() {
+        return list_id;
+    }
+
+    public void setList_id(int list_id) {
+        this.list_id = list_id;
+    }
+
     private String htmlParser(String text) {
         String[] textArr = text.split("&");
         for (String x : textArr) {
@@ -93,9 +100,7 @@ public class Note {
                 //
             }
         }
-        
 
         return text;
     }
-
 }

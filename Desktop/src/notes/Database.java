@@ -12,6 +12,52 @@ import java.util.List;
 public class Database {
 
     private final String USER_AGENT = "Mozilla/5.0";
+    
+     private String key = "0";
+
+    /*public Database(Context context){
+        key = context.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
+    }*/
+
+    public String login(String email, String password){
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("1");
+        parms.add("username");
+        parms.add(email);
+        parms.add("password");
+        parms.add(password);
+        String response = "";
+        try {
+            //response = sendPost(parms);
+            response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        System.out.println("Login");
+        return response;
+    }
+
+    public boolean register(String email, String password){
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("2");
+        parms.add("username");
+        parms.add(email);
+        parms.add("password");
+        parms.add(password);
+        String response = "";
+        try {
+            //response = sendPost(parms);
+            response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        System.out.println("Registered");
+        return response.equals("Table Updated");
+    }
 
     public List<Note> retrieveAllNotes(int ID) {
         List<Note> noteList = new ArrayList<>();
@@ -32,16 +78,17 @@ public class Database {
             return noteList;
         }
 
-        Note note;
+      Note note; int noteid = 0;
         //System.out.println(response);
         for (String noteStr : response.split("/split2/")) {
             note = new Note();
             String[] noteArr = noteStr.split("/split1/");
+            note.setList_id(noteid++);
             note.setId(Integer.valueOf(noteArr[0]));
             note.setUser_id(Integer.valueOf(noteArr[1]));
             note.setTitle(noteArr[2]);
             note.setContent(noteArr[3].replace("/para/", "\n"));
-            note.setDate(noteArr[4]);
+            note.setDate(toVisualDate(noteArr[4], "-"));
             note.setType(Integer.valueOf(noteArr[5]));
 
             noteList.add(note);
@@ -195,6 +242,18 @@ public class Database {
         //print result
         //System.out.println(response.toString());
         return response.toString();
+    }
+    
+    private String toVisualDate(String date, String s) {
+        String returnDate = "";
+        String[] dateArr = date.split(s);
+        for (int x = dateArr.length - 1; x >= 0; x--) {
+            returnDate += dateArr[x];
+            if (x != 0) {
+                returnDate += "/";
+            }
+        }
+        return returnDate;
     }
 
 }

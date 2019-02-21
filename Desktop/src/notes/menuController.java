@@ -1,0 +1,225 @@
+package notes;
+
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.Cursor;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+public class menuController implements Initializable {
+
+    List<Note> notes;
+    Stage stage;
+    Database database;
+    private double sceneX, sceneY, alertX, alertY;
+    boolean saved = true;
+
+    @FXML
+    private ImageView exit;
+    @FXML
+    private Pane exitPane;
+    @FXML
+    private ImageView add;
+    @FXML
+    private Pane addPane;
+    @FXML
+    private ImageView option;
+    @FXML
+    private Pane optionPane;
+    @FXML
+    private Pane titleBar;
+    @FXML
+    private TextArea contentText;
+    @FXML
+    private TextField titleText;
+    @FXML
+    private ScrollPane content;
+    @FXML
+    private Pane clickPane;
+    @FXML
+    private Label name;
+    @FXML
+    private Label date;
+    @FXML
+    private AnchorPane menuPane;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        database = new Database();
+    }
+
+    public void start(List<Note> notes, Stage stage) {
+        this.notes = notes;
+        this.stage = stage;
+
+        reload(notes);
+        content.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        content.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        randomLocation();
+        titleDrag();
+        stage.setAlwaysOnTop(true);
+
+        stage.iconifiedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean t, Boolean value) -> {
+            if (!value) {
+                stage.setAlwaysOnTop(true);
+            }
+        });
+    }
+
+    private void reload(List<Note> notes) {
+        Note note;
+        menuPane.getChildren().clear();
+        menuPane.setStyle("-fx-background-color: #ffe900;");
+        for (int x = notes.size() - 1; x >= 0; x--) {
+            note = notes.get(x);
+            Label name2 = new Label(), date2 = new Label();
+            Pane clickPane2 = new Pane();
+            menuPane.getChildren().add(clickPane2);
+
+            clickPane2.setLayoutX(clickPane.getLayoutX());
+            clickPane2.setLayoutY(clickPane.getLayoutY() + 60);
+            clickPane2.setPrefHeight(clickPane.getPrefHeight());
+            clickPane2.setPrefWidth(clickPane.getPrefWidth());
+            clickPane2.getStyleClass().add("rounded");
+            clickPane2.getStyleClass().add("border-main");
+
+            clickPane2.getChildren().add(name2);
+            clickPane2.getChildren().add(date2);
+
+            name2.setLayoutX(name.getLayoutX());
+            name2.setLayoutY(name.getLayoutY());
+            name2.setPrefHeight(name.getPrefHeight());
+            name2.setPrefWidth(name.getPrefWidth());
+
+            date2.setLayoutX(date.getLayoutX());
+            date2.setLayoutY(date.getLayoutY());
+            date2.setPrefHeight(date.getPrefHeight());
+            date2.setPrefWidth(date.getPrefWidth());
+
+            name = name2;
+            date = date2;
+            clickPane = clickPane2;
+            
+            System.out.println(note.getTitle() + "  " + note.getList_id() + "  " + x);
+            name.setText(note.getTitle());
+            date.setText(note.getDate());
+            final int ID = note.getList_id();
+            clickPane.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    noteClick(ID);
+                }
+            });
+        }
+        menuPane.applyCss();
+    }
+
+    private void noteClick(int ID) {
+        try {
+            (new Notes()).makeStage(new Stage(), notes.get(ID), 0);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+    }
+
+    private void randomLocation() {
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        int StageX = (int) bounds.getWidth();
+        int StageY = (int) bounds.getHeight();
+        Random rand = new Random();
+        int movementX = rand.nextInt(StageX - (int) Math.round(StageX * 0.15));
+        int movementY = rand.nextInt(StageY - (int) Math.round(StageY * 0.30));
+        stage.setX(movementX);
+        stage.setY(movementY);
+    }
+
+    @FXML
+    private void add(MouseEvent event) {
+        //System.out.println("Add clicked");
+        try {
+            (new Notes()).makeStage(new Stage(), new Note(), 1);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+    }
+
+    @FXML
+    private void exit(MouseEvent event) {
+        ButtonType Hide = new ButtonType("Close");
+        ButtonType Min = new ButtonType("Minimise");
+        ButtonType Not = new ButtonType("Nothing");
+        Alert alert = new Alert(AlertType.NONE, "Exit Options", Hide, Min, Not);
+        alert.setX(stage.getX() - 50);
+        alert.setY(stage.getY() + 80);
+        alert.initStyle(StageStyle.UNDECORATED);
+        stage.setAlwaysOnTop(false);
+
+        alert.getDialogPane().setOnMousePressed((MouseEvent mouseEvent) -> {
+            alertX = alert.getX() - mouseEvent.getScreenX();
+            alertY = alert.getY() - mouseEvent.getScreenY();
+            alert.getDialogPane().setCursor(Cursor.MOVE);
+        });
+
+        alert.getDialogPane().setOnMouseReleased((MouseEvent mouseEvent) -> {
+            alert.getDialogPane().setCursor(Cursor.DEFAULT);
+        });
+
+        alert.getDialogPane().setOnMouseDragged((MouseEvent mouseEvent) -> {
+            alert.setX(mouseEvent.getScreenX() + alertX);
+            alert.setY(mouseEvent.getScreenY() + alertY);
+        });
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.orElse(Not) == Hide) {
+            stage.close();
+        } else if (result.orElse(Not) == Min) {
+            stage.setIconified(true);
+        } else {
+            //System.out.println("Exit clicked: Nothing");
+            stage.setAlwaysOnTop(true);
+        }
+    }
+
+    public void titleDrag() {
+        titleBar.setOnMousePressed((MouseEvent mouseEvent) -> {
+            sceneX = stage.getX() - mouseEvent.getScreenX();
+            sceneY = stage.getY() - mouseEvent.getScreenY();
+            titleBar.setCursor(Cursor.MOVE);
+        });
+
+        titleBar.setOnMouseReleased((MouseEvent mouseEvent) -> {
+            titleBar.setCursor(Cursor.DEFAULT);
+        });
+
+        titleBar.setOnMouseDragged((MouseEvent mouseEvent) -> {
+            stage.setX(mouseEvent.getScreenX() + sceneX);
+            stage.setY(mouseEvent.getScreenY() + sceneY);
+        });
+    }
+
+}

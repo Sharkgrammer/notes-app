@@ -20,14 +20,15 @@ public class Notes extends Application {
         Database database = new Database();
         List<Note> noteList = database.retrieveAllNotes(user_id);
 
-        if (noteList.isEmpty()) {
+        startUp(stage, noteList);
+        /*if (noteList.isEmpty()) {
             makeStage(stage, new Note(), 1);
         } else {
             for (Note note : noteList) {
                 stage = new Stage();
                 makeStage(stage, note, 0);
             }
-        }
+        }*/
     }
 
     void makeStage(Stage stage, Note note, int mode) throws Exception {
@@ -44,6 +45,20 @@ public class Notes extends Application {
 
         mainController controller = loader.<mainController>getController();
         controller.start(note, stage);
+
+        stage.getIcons().add(new Image("assets/logo.png"));
+        stage.show();
+    }
+    
+    void startUp(Stage stage, List<Note> notes) throws Exception {
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.initStyle(StageStyle.TRANSPARENT);
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
+        stage.setScene(new Scene((Parent) loader.load()));
+
+        menuController controller = loader.<menuController>getController();
+        controller.start(notes, stage);
 
         stage.getIcons().add(new Image("assets/logo.png"));
         stage.show();
