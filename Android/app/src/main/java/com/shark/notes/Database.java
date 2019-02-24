@@ -36,8 +36,8 @@ public class Database {
         parms.add(password);
         String response = "";
         try {
-            //response = sendPost(parms);
-            response = sendGet(parms);
+            response = sendPost(parms);
+            //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -56,8 +56,8 @@ public class Database {
         parms.add(password);
         String response = "";
         try {
-            //response = sendPost(parms);
-            response = sendGet(parms);
+            response = sendPost(parms);
+            //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -191,6 +191,7 @@ public class Database {
     private String sendPost(List<String> parms) throws Exception {
         parms.add("key");
         parms.add(key);
+
 
         String url = "http://notesapp.gearhostpreview.com";
         String data = "";
