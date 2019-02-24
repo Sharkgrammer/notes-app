@@ -31,7 +31,21 @@
 }
 
 .rounded {
+  -fx-prompt-text-fill: #444;
   -fx-border-radius: 50;
   -fx-background-radius: 50;
   -fx-background-color: #ffca00ff;
+}
+
+.but {
+  -fx-border-radius: 10;
+  -fx-background-radius: 10;
+  -fx-background-color: #ffca00ff;
+  -fx-border-width: 0.7;
+  -fx-border-color: black;
+}
+
+.bg {
+  -fx-background-color: transparent;
+  -fx-prompt-text-fill: #444;
 }

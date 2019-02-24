@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -54,10 +51,6 @@ public class menuController implements Initializable {
     @FXML
     private Pane titleBar;
     @FXML
-    private TextArea contentText;
-    @FXML
-    private TextField titleText;
-    @FXML
     private ScrollPane content;
     @FXML
     private Pane clickPane;
@@ -67,6 +60,12 @@ public class menuController implements Initializable {
     private Label date;
     @FXML
     private AnchorPane menuPane;
+    @FXML
+    private Pane logPane;
+    @FXML
+    private TextField email;
+    @FXML
+    private TextField password;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -76,8 +75,17 @@ public class menuController implements Initializable {
     public void start(List<Note> notes, Stage stage) {
         this.notes = notes;
         this.stage = stage;
-
-        reload(notes);
+        
+        if (notes == null) {
+            content.setVisible(false);
+            logPane.setVisible(true);
+            addPane.setVisible(false);
+            optionPane.setVisible(false);
+        }else{
+            reload(notes);
+        }
+        
+        menuPane.setStyle("-fx-background-color: #ffe900;");
         content.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         content.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         randomLocation();
@@ -94,7 +102,7 @@ public class menuController implements Initializable {
     private void reload(List<Note> notes) {
         Note note;
         menuPane.getChildren().clear();
-        menuPane.setStyle("-fx-background-color: #ffe900;");
+        Pane tempPane = clickPane;
         for (int x = notes.size() - 1; x >= 0; x--) {
             note = notes.get(x);
             Label name2 = new Label(), date2 = new Label();
@@ -124,8 +132,8 @@ public class menuController implements Initializable {
             name = name2;
             date = date2;
             clickPane = clickPane2;
-            
-            System.out.println(note.getTitle() + "  " + note.getList_id() + "  " + x);
+
+            //System.out.println(note.getTitle() + "  " + note.getList_id() + "  " + x);
             name.setText(note.getTitle());
             date.setText(note.getDate());
             final int ID = note.getList_id();
@@ -136,7 +144,7 @@ public class menuController implements Initializable {
                 }
             });
         }
-        menuPane.applyCss();
+        clickPane = tempPane;
     }
 
     private void noteClick(int ID) {
@@ -165,6 +173,16 @@ public class menuController implements Initializable {
             (new Notes()).makeStage(new Stage(), new Note(), 1);
         } catch (Exception ex) {
             System.out.println(ex.toString());
+        }
+    }
+    
+    @FXML
+    private void option(MouseEvent event) {
+        //reload
+        
+        if (!notes.isEmpty()){
+            notes = database.retrieveAllNotes(notes.get(0).getUser_id());
+            reload(notes);
         }
     }
 
@@ -202,6 +220,48 @@ public class menuController implements Initializable {
         } else {
             //System.out.println("Exit clicked: Nothing");
             stage.setAlwaysOnTop(true);
+        }
+    }
+
+    @FXML
+    private void login(MouseEvent event) {
+        String Email = email.getText();
+        String Password = password.getText();
+
+        if (Email.isEmpty() || Password.isEmpty()) {
+
+        } else {
+            String ans = database.login(Email, Password);
+            if (!ans.isEmpty() && !ans.equals("Error")) {
+                try {
+                    database.setKey(ans);
+                    (new Notes()).start(new Stage());
+                    stage.close();
+                } catch (Exception ex) {
+                    System.out.println(ex.toString());
+                }
+            } else {
+                System.out.println("Oof");
+            }
+        }
+
+    }
+
+    @FXML
+    private void register(MouseEvent event) {
+        String Email = email.getText();
+        String Password = password.getText();
+
+        if (Email.isEmpty() || Password.isEmpty()) {
+
+        } else {
+            Boolean ans = database.register(Email, Password);
+
+            if (ans) {
+                System.out.println("Yeetus");
+            } else {
+                System.out.println("Oof");
+            }
         }
     }
 

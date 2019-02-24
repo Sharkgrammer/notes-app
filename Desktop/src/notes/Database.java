@@ -1,6 +1,11 @@
 package notes;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -9,17 +14,17 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Database {
 
     private final String USER_AGENT = "Mozilla/5.0";
-    
-     private String key = "0";
 
-    /*public Database(Context context){
-        key = context.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
-    }*/
+    private String key = "0";
 
-    public String login(String email, String password){
+    public Database(){
+        key = getKey();
+    }
+    public String login(String email, String password) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
         parms.add("1");
@@ -29,8 +34,8 @@ public class Database {
         parms.add(password);
         String response = "";
         try {
-            //response = sendPost(parms);
-            response = sendGet(parms);
+            response = sendPost(parms);
+            //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -39,7 +44,7 @@ public class Database {
         return response;
     }
 
-    public boolean register(String email, String password){
+    public boolean register(String email, String password) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
         parms.add("2");
@@ -49,8 +54,8 @@ public class Database {
         parms.add(password);
         String response = "";
         try {
-            //response = sendPost(parms);
-            response = sendGet(parms);
+            response = sendPost(parms);
+            //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -78,7 +83,8 @@ public class Database {
             return noteList;
         }
 
-      Note note; int noteid = 0;
+        Note note;
+        int noteid = 0;
         //System.out.println(response);
         for (String noteStr : response.split("/split2/")) {
             note = new Note();
@@ -164,7 +170,9 @@ public class Database {
     }
 
     private String sendPost(List<String> parms) throws Exception {
-
+        parms.add("key");
+        parms.add(key);
+        
         String obj = "http://notesapp.gearhostpreview.com";
         URL url = new URL(obj);
         String data = "";
@@ -204,7 +212,9 @@ public class Database {
     }
 
     private String sendGet(List<String> parms) throws Exception {
-
+        parms.add("key");
+        parms.add(key);
+        
         String url = "http://notesapp.gearhostpreview.com?";
 
         String urlParameters = "";
@@ -243,7 +253,7 @@ public class Database {
         //System.out.println(response.toString());
         return response.toString();
     }
-    
+
     private String toVisualDate(String date, String s) {
         String returnDate = "";
         String[] dateArr = date.split(s);
@@ -254,6 +264,45 @@ public class Database {
             }
         }
         return returnDate;
+    }
+
+    public void setKey(String key) {
+        accessKey(key, true);
+    }
+
+    public String getKey() {
+        return accessKey(null, false);
+    }
+
+    private String accessKey(String key, boolean write) {
+        if (write) {
+            String fileName = "key.con";
+            try {
+                FileWriter fileWriter = new FileWriter(fileName);
+                try (BufferedWriter bw = new BufferedWriter(fileWriter)) {
+                    bw.write(key);
+                }
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
+
+            return "";
+        } else {
+            String fileName = "key.con";
+            String line = "", keyAccess = "";
+            try {
+                FileReader fileReader = new FileReader(fileName);
+                try (BufferedReader br = new BufferedReader(fileReader)) {
+                    while ((line = br.readLine()) != null) {
+                        keyAccess = line;
+                    }
+                }
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
+
+            return keyAccess;
+        }
     }
 
 }
