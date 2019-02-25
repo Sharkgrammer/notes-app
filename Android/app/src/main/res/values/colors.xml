@@ -6,5 +6,5 @@
     <color name="topColour">#ffca00</color>
     <color name="botColour">#ffe900</color>
     <color name="textColour">#000000</color>
-    <color name="hintColour">#333333</color>
+    <color name="hintColour">#444444</color>
 </resources>

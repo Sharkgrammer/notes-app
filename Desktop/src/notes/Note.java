@@ -9,14 +9,16 @@ public class Note {
     private String content;
     private String date;
     private int type;
+    private int theme_id;
 
-    public Note(){
+    public Note() {
         id = 0;
         user_id = 0;
         title = "";
         content = "";
         date = "";
         type = 0;
+        theme_id = 0;
     }
 
     public int getId() {
@@ -67,7 +69,6 @@ public class Note {
         this.type = type;
     }
 
-
     public int getList_id() {
         return list_id;
     }
@@ -79,7 +80,7 @@ public class Note {
     private String htmlParser(String text) {
         String[] textArr = text.split("&");
         for (String x : textArr) {
-            try{
+            try {
                 x = x.split(";")[0];
                 switch (x) {
                     case "amp":
@@ -96,11 +97,19 @@ public class Note {
                         break;
                 }
                 textArr = text.split("@");
-            }catch(Exception e){
+            } catch (Exception e) {
                 //
             }
         }
 
         return text;
+    }
+
+    public int getTheme_id() {
+        return theme_id;
+    }
+
+    public void setTheme_id(int theme_id) {
+        this.theme_id = theme_id;
     }
 }

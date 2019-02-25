@@ -1,6 +1,7 @@
 package notes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -22,6 +23,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -33,6 +35,7 @@ public class mainController implements Initializable {
     Database database;
     private double sceneX, sceneY, alertX, alertY;
     boolean saved = true;
+    private Theme theme;
 
     @FXML
     private ImageView exit;
@@ -47,11 +50,17 @@ public class mainController implements Initializable {
     @FXML
     private Pane optionPane;
     @FXML
+    private ImageView save;
+    @FXML
+    private Pane savePane;
+    @FXML
     private Pane titleBar;
     @FXML
     private TextField titleText;
     @FXML
     private TextArea contentText;
+    @FXML
+    private AnchorPane mainPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -61,13 +70,17 @@ public class mainController implements Initializable {
     public void start(Note note, Stage stage) {
         this.note = note;
         this.stage = stage;
+        theme = Notes.themes.get( note.getTheme_id() - 1);
         randomLocation();
         titleDrag();
+        cssRefresh();
         stage.setAlwaysOnTop(true);
         titleText.setText(note.getTitle());
         contentText.setText(note.getContent());
         contentText.requestFocus();
         contentText.wrapTextProperty().set(true);
+        
+        System.out.println(theme.getName());
 
         ChangeListener savedSet = (ChangeListener<String>) (ObservableValue<? extends String> observableValue, String s, String s2) -> {
             saved = false;
@@ -94,6 +107,13 @@ public class mainController implements Initializable {
         stage.setY(movementY);
     }
 
+    private void cssRefresh() {
+        titleBar.setStyle("-fx-background-color: " + theme.getPrimaryColour());
+        mainPane.setStyle("-fx-background-color: " + theme.getSecondaryColour());
+        contentText.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
+        titleText.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
+    }
+
     @FXML
     private void add(MouseEvent event) {
         //System.out.println("Add clicked");
@@ -103,9 +123,14 @@ public class mainController implements Initializable {
             System.out.println(ex.toString());
         }
     }
-
+    
     @FXML
     private void option(MouseEvent event) {
+        
+    }
+
+    @FXML
+    private void save(MouseEvent event) {
         //System.out.println("Option clicked");
         note.setContent(contentText.getText());
         note.setTitle(titleText.getText());
@@ -148,12 +173,12 @@ public class mainController implements Initializable {
         } else if (result.orElse(Not) == Hide) {
             //System.out.println("Exit clicked: Close");
             if (!saved) {
-                option(null);
+                save(null);
             }
             stage.close();
         } else if (result.orElse(Not) == Min) {
             if (!saved) {
-                option(null);
+                save(null);
             }
             //System.out.println("Exit clicked: Minimise");
             stage.setIconified(true);

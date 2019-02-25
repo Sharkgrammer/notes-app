@@ -15,9 +15,12 @@ public class Notes extends Application {
     String email;
     String key;
     
+    public static List<Theme> themes;
+    
     public Notes(){
         Database database = new Database();
         String temp = database.getKey();
+        themes = database.loadThemes();
         
         if (!temp.equals("")) {
             user_id = Integer.parseInt(temp.split(";")[0]);

@@ -72,14 +72,14 @@ if($type > 2){
 	{
 		if(mysqli_num_rows($result) == 0)
 		{
-			$type = 0;
-			echo ":(";
+			//$type = 0;
+			//echo ":(";
 		}
 		else
 		{
 			while($row = mysqli_fetch_assoc($result)){
 				if ($auth_key != $row['user_key']){
-					$type = 0;
+					//$type = 0;
 				}
 			}
 		}
@@ -116,8 +116,7 @@ if ($type == 1){
 					$temp_id = $row['user_id'];
 					echo $temp_id;
 					echo ";";
-					
-					if ($temp_key.length < 3){
+					if (strlen($temp_key) < 3){
 						$key_string = generateRandomString(50);
 						$query2 = "update users set user_key = '$key_string' where user_id = '$temp_id';";
 						mysqli_query($con, $query2) or die("Error");
@@ -133,21 +132,38 @@ if ($type == 1){
 	}
 }elseif($type == 2){
 	$user_email = $con->real_escape_string(htmlspecialchars($_POST['username']));
-	$user_pass = $con->real_escape_string(htmlspecialchars($_POST['password']));
-	$hashed_password = password_hash($user_pass, PASSWORD_DEFAULT);
 	
-	$query = "insert into users (user_email, user_pass)
-	values('$user_email', '$hashed_password');";
-	mysqli_query($con, $query) or die(mysqli_error($con));
-	echo "Table Updated";
+	$query = "select user_email from users where user_email LIKE '$user_email'";
+	$result = mysqli_query($con, $query) or die('Error querying database');		
+	if(!$result)
+	{
+		echo 'Empty search' . mysqli_error();
+	}
+	else
+	{
+		if(mysqli_num_rows($result) == 0)
+		{
+			$user_pass = $con->real_escape_string(htmlspecialchars($_POST['password']));
+			$hashed_password = password_hash($user_pass, PASSWORD_DEFAULT);
+	
+			$query2 = "insert into users (user_email, user_pass)
+			values('$user_email', '$hashed_password');";
+			mysqli_query($con, $query2) or die(mysqli_error($con));
+			echo "Table Updated";
+		}
+		else
+		{
+			echo "Error";
+		}
+	}
 }elseif($type == 3){
 	$id = $con->real_escape_string(htmlspecialchars($_POST['ID']));
 	$title = $con->real_escape_string(htmlspecialchars($_POST['title']));
 	$content = $con->real_escape_string(htmlspecialchars($_POST['content']));
 	$content = str_replace("\\n", "/para/", $content);
 	$type = $con->real_escape_string(htmlspecialchars($_POST['ntype']));
-	$query = "insert into note (user_id, note_title, note_content, note_date, note_type)
-	values('$id', '$title', '$content', NOW(), '$type');";
+	$query = "insert into note (user_id, note_title, note_content, note_date, note_type, theme_id)
+	values('$id', '$title', '$content', NOW(), '$type', 1);";
 	mysqli_query($con, $query) or die(mysqli_error($con));
 	
 	$query3 = "select MAX(note_id) from note";
@@ -163,7 +179,7 @@ if ($type == 1){
 	$result = mysqli_query($con, $query) or die(mysqli_error($con));		
 	if(!$result)
 	{
-		echo 'Empty posts' . mysqli_error();
+		echo 'Empty notes' . mysqli_error();
 	}
 	else
 	{
@@ -186,6 +202,8 @@ if ($type == 1){
 				echo $row['note_date'];
 				echo "/split1/";
 				echo $row['note_type'];
+				echo "/split1/";
+				echo $row['theme_id'];
 				echo "/split2/";
 			}
 		}
@@ -206,6 +224,43 @@ if ($type == 1){
 	$query = "update note set note_title = '$title', 
 	note_content = '$content', note_type = '$type' where note_id = '$id'";
 	mysqli_query($con, $query) or die(mysqli_error($con));
+}elseif($type == 7){
+	$query = "select * from theme";
+	
+	$result = mysqli_query($con, $query) or die(mysqli_error($con));		
+	if(!$result)
+	{
+		echo 'Empty themes ' . mysqli_error();
+	}
+	else
+	{
+		if(mysqli_num_rows($result) == 0)
+		{
+			echo "Error";
+		}
+		else
+		{
+			while($row = mysqli_fetch_assoc($result))
+			{
+				echo $row['theme_id'];
+				echo ",";
+				echo $row['theme_name'];
+				echo ",";
+				echo $row['prim_col'];
+				echo ",";
+				echo $row['seco_col'];
+				echo ",";
+				echo $row['text_col'];
+				echo ",";
+				echo $row['hint_col'];
+				echo ",";
+				echo $row['acce_col'];
+				echo ",";
+				echo $row['but_col'];
+				echo ";";
+			}
+		}
+	}
 }else{
 	echo "Error 404: Error not found";
 }

@@ -2,7 +2,7 @@ package notes;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,18 +12,66 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.filechooser.FileSystemView;
 
 public class Database {
 
-    private final String USER_AGENT = "Mozilla/5.0";
+    private final String USER_AGENT = "Mozilla/5.0", dir = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "/JavaNotes";;
 
     private String key = "0";
 
-    public Database(){
+    public Database() {
+        Path path = Paths.get(dir);
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException ex) {
+                System.out.println(ex.toString());
+            }
+        }
+        
         key = getKey();
     }
+    
+    public List<Theme> loadThemes(){
+        List<Theme> themes = new ArrayList<>();
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("7");
+        String response = "";
+        try {
+            response = sendPost(parms);
+            //response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+        
+        Theme theme;
+        for (String x : response.split(";")){
+            String[] y = x.split(",");
+            theme = new Theme();
+            
+            int yPointer = 0;
+            theme.setTheme_id(Integer.parseInt(y[yPointer++]));
+            theme.setName(y[yPointer++]);
+            theme.setPrimaryColour(y[yPointer++]);
+            theme.setSecondaryColour(y[yPointer++]);
+            theme.setTextColour(y[yPointer++]);
+            theme.setHintColour(y[yPointer++]);
+            theme.setAccentColour(y[yPointer++]);
+            theme.setButtonColour(y[yPointer++]);
+            
+            themes.add(theme);
+        }
+        
+        return themes;
+    }
+
     public String login(String email, String password) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -88,14 +136,16 @@ public class Database {
         //System.out.println(response);
         for (String noteStr : response.split("/split2/")) {
             note = new Note();
+            int notePointer = 0;
             String[] noteArr = noteStr.split("/split1/");
             note.setList_id(noteid++);
-            note.setId(Integer.valueOf(noteArr[0]));
-            note.setUser_id(Integer.valueOf(noteArr[1]));
-            note.setTitle(noteArr[2]);
-            note.setContent(noteArr[3].replace("/para/", "\n"));
-            note.setDate(toVisualDate(noteArr[4], "-"));
-            note.setType(Integer.valueOf(noteArr[5]));
+            note.setId(Integer.valueOf(noteArr[notePointer++]));
+            note.setUser_id(Integer.valueOf(noteArr[notePointer++]));
+            note.setTitle(noteArr[notePointer++]);
+            note.setContent(noteArr[notePointer++].replace("/para/", "\n"));
+            note.setDate(toVisualDate(noteArr[notePointer++], "-"));
+            note.setType(Integer.valueOf(noteArr[notePointer++]));
+            note.setTheme_id(Integer.valueOf(noteArr[notePointer++]));
 
             noteList.add(note);
         }
@@ -271,12 +321,16 @@ public class Database {
     }
 
     public String getKey() {
-        return accessKey(null, false);
+        if (key.equals("0")){
+            return accessKey(null, false);
+        }else{
+            return key;
+        }
     }
 
     private String accessKey(String key, boolean write) {
+        String fileName = dir + "/key.con";
         if (write) {
-            String fileName = "key.con";
             try {
                 FileWriter fileWriter = new FileWriter(fileName);
                 try (BufferedWriter bw = new BufferedWriter(fileWriter)) {
@@ -288,8 +342,7 @@ public class Database {
 
             return "";
         } else {
-            String fileName = "key.con";
-            String line = "", keyAccess = "";
+            String line, keyAccess = "";
             try {
                 FileReader fileReader = new FileReader(fileName);
                 try (BufferedReader br = new BufferedReader(fileReader)) {
