@@ -32,13 +32,12 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
         String Key = this.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
 
-        Key = "1;bees";
+        Log.wtf("huh", Key);
 
         if (Key.equals("0")) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }else{
-            //Log.wtf("huh", Key);
             user_id = Integer.parseInt(Key.split(";")[0]);
 
             database = new Database(this);

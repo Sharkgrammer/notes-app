@@ -111,14 +111,20 @@ if ($type == 1){
 			{
 				while($row = mysqli_fetch_assoc($result))
 				{
-					$key_string = generateRandomString(50);
-					$temp_id = $row['user_id'];
-					$query2 = "update users set user_key = '$key_string' where user_id = '$temp_id';";
-					mysqli_query($con, $query2) or die("Error");
 					
-					echo $row['user_id'];
+					$temp_key = $row['user_key'];
+					$temp_id = $row['user_id'];
+					echo $temp_id;
 					echo ";";
-					echo $key_string;
+					
+					if ($temp_key.length < 3){
+						$key_string = generateRandomString(50);
+						$query2 = "update users set user_key = '$key_string' where user_id = '$temp_id';";
+						mysqli_query($con, $query2) or die("Error");
+						echo $key_string;						
+					}else{
+						echo $temp_key;
+					}
 				}
 			}
 		}
