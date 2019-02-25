@@ -9,6 +9,7 @@ public class Note {
     private String content;
     private String date;
     private int type;
+    private int theme_id;
 
     public Note(){
         id = 0;
@@ -102,5 +103,13 @@ public class Note {
         }
 
         return text;
+    }
+
+    public int getTheme_id() {
+        return theme_id;
+    }
+
+    public void setTheme_id(int theme_id) {
+        this.theme_id = theme_id;
     }
 }

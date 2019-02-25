@@ -35,6 +35,7 @@ public class menuController implements Initializable {
     Database database;
     private double sceneX, sceneY, alertX, alertY;
     boolean saved = true;
+    List<Theme> themes = Notes.themes;
 
     @FXML
     private ImageView exit;
@@ -60,6 +61,8 @@ public class menuController implements Initializable {
     private Label date;
     @FXML
     private AnchorPane menuPane;
+    @FXML
+    private AnchorPane menuMainPane;
     @FXML
     private Pane logPane;
     @FXML
@@ -113,6 +116,7 @@ public class menuController implements Initializable {
             clickPane2.setLayoutY(clickPane.getLayoutY() + 60);
             clickPane2.setPrefHeight(clickPane.getPrefHeight());
             clickPane2.setPrefWidth(clickPane.getPrefWidth());
+            clickPane2.setStyle("-fx-background-color: " + themes.get(note.getTheme_id() - 1).getPrimaryColour());
             clickPane2.getStyleClass().add("rounded");
             clickPane2.getStyleClass().add("border-main");
 
@@ -149,7 +153,11 @@ public class menuController implements Initializable {
 
     private void noteClick(int ID) {
         try {
+            Theme theme = themes.get(notes.get(ID).getTheme_id() - 1);
             (new Notes()).makeStage(new Stage(), notes.get(ID), 0);
+            menuPane.setStyle("-fx-background-color: " + theme.getSecondaryColour());
+            menuMainPane.setStyle("-fx-background-color: " + theme.getPrimaryColour());
+            titleBar.setStyle("-fx-background-color: " + theme.getPrimaryColour());
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }

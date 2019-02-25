@@ -2,6 +2,7 @@ package com.shark.notes;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     Note note;
     View Child;
     Database database;
+    public static List<Theme> themes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
             database = new Database(this);
             notes = database.retrieveAllNotes(user_id);
+            themes = database.loadThemes();
             layNotes = findViewById(R.id.layNote);
 
             LoadNotes();
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         i.putExtra("noteContent", note.getContent());
         i.putExtra("noteID", String.valueOf(note.getId()));
         i.putExtra("noteUser", String.valueOf(note.getUser_id()));
+        i.putExtra("noteTheme", String.valueOf(note.getTheme_id()));
         startActivity(i);
     }
 
@@ -63,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         for (int i = 0; i < notes.size(); i++) {
             note = notes.get(i);
             Child = LayoutInflater.from(this).inflate(R.layout.noteitem, null);
+
+            //Child.setBackgroundColor(Color.parseColor(themes.get(note.getTheme_id() - 1).getSecondaryColour()));
+            //shadowbg sets the colour from xml, make a fix for this later
+
             ((TextView) Child.findViewById(R.id.noteTitle)).setText(note.getTitle());
             ((TextView) Child.findViewById(R.id.noteDate)).setText(note.getDate());
 
@@ -92,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             i.putExtra("noteContent", "");
             i.putExtra("noteID", String.valueOf(database.addNote(user_id, "", "", 1)));
             i.putExtra("noteUser", String.valueOf(1));
+            i.putExtra("noteTheme", String.valueOf(1));
 
             startActivity(i);
         } catch (Exception ex) {

@@ -2,30 +2,31 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/noteLayTitle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/topColour"
 
+    android:background="@color/topColour"
     tools:context=".NoteActivity">
 
     <ImageView
-        android:id="@+id/Add"
-        android:onClick="add"
+        android:id="@+id/Option"
         android:layout_width="35dp"
         android:layout_height="35dp"
+        android:onClick="add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintHorizontal_bias="0.647"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.039"
-        app:srcCompat="@drawable/addblack" />
+        app:srcCompat="@drawable/optionblack" />
 
     <ImageView
         android:id="@+id/Exit"
-        android:onClick="exit"
         android:layout_width="35dp"
         android:layout_height="35dp"
+        android:onClick="exit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.954"
@@ -53,7 +54,6 @@
         android:layout_height="30dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@null"
         android:ems="10"
@@ -63,12 +63,13 @@
         android:textColorHint="@color/hintColour"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.354"
+        app:layout_constraintHorizontal_bias="0.046"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.034" />
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/noteLayContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"

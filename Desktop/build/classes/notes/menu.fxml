@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane id="AnchorPane" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: ffe900ff;" styleClass="border-main" stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="notes.menuController">
+<AnchorPane id="AnchorPane" fx:id="menuMainPane" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: ffe900ff;" styleClass="border-main" stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="notes.menuController">
    <children>
       <ScrollPane fx:id="content" layoutY="50.0" prefHeight="250.0" prefWidth="300.0" style="-fx-background-color: transparent;">
         <content>

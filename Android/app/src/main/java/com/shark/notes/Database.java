@@ -26,6 +26,40 @@ public class Database {
         key = context.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
     }
 
+    public List<Theme> loadThemes(){
+        List<Theme> themes = new ArrayList<>();
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("7");
+        String response = "";
+        try {
+            response = sendPost(parms);
+            //response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        Theme theme;
+        for (String x : response.split(";")){
+            String[] y = x.split(",");
+            theme = new Theme();
+
+            int yPointer = 0;
+            theme.setTheme_id(Integer.parseInt(y[yPointer++]));
+            theme.setName(y[yPointer++]);
+            theme.setPrimaryColour(y[yPointer++]);
+            theme.setSecondaryColour(y[yPointer++]);
+            theme.setTextColour(y[yPointer++]);
+            theme.setHintColour(y[yPointer++]);
+            theme.setAccentColour(y[yPointer++]);
+            theme.setButtonColour(y[yPointer]);
+
+            themes.add(theme);
+        }
+
+        return themes;
+    }
+
     public String login(String email, String password){
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -87,16 +121,19 @@ public class Database {
 
         Note note; int noteid = 0;
         //System.out.println(response);
+
         for (String noteStr : response.split("/split2/")) {
             note = new Note();
+            int notePointer = 0;
             String[] noteArr = noteStr.split("/split1/");
             note.setList_id(noteid++);
-            note.setId(Integer.valueOf(noteArr[0]));
-            note.setUser_id(Integer.valueOf(noteArr[1]));
-            note.setTitle(noteArr[2]);
-            note.setContent(noteArr[3].replace("/para/", "\n"));
-            note.setDate(toVisualDate(noteArr[4], "-"));
-            note.setType(Integer.valueOf(noteArr[5]));
+            note.setId(Integer.valueOf(noteArr[notePointer++]));
+            note.setUser_id(Integer.valueOf(noteArr[notePointer++]));
+            note.setTitle(noteArr[notePointer++]);
+            note.setContent(noteArr[notePointer++].replace("/para/", "\n"));
+            note.setDate(toVisualDate(noteArr[notePointer++], "-"));
+            note.setType(Integer.valueOf(noteArr[notePointer++]));
+            note.setTheme_id(Integer.valueOf(noteArr[notePointer]));
 
             noteList.add(note);
         }
