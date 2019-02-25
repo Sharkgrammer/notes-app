@@ -175,6 +175,18 @@ public class mainController implements Initializable {
             if (!saved) {
                 save(null);
             }
+            //close the stage, remove it from the list
+            
+            List<stageControl> list = Notes.stages;
+            
+            for (stageControl x : list){
+                if (x.noteID() == note.getId()){
+                    list.remove(x);
+                    break;
+                }
+            }
+            Notes.stages = list;
+            
             stage.close();
         } else if (result.orElse(Not) == Min) {
             if (!saved) {

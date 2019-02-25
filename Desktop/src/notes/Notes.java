@@ -1,5 +1,6 @@
 package notes;
 
+import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,18 +12,18 @@ import javafx.stage.StageStyle;
 
 public class Notes extends Application {
 
-    int user_id = 0;
-    String email;
-    String key;
-    
+    private int user_id = 0;
+    private String email;
+    private String key;
     public static List<Theme> themes;
+    public static List<stageControl> stages;
     
     public Notes(){
         Database database = new Database();
         String temp = database.getKey();
-        themes = database.loadThemes();
         
         if (!temp.equals("")) {
+            themes = database.loadThemes();
             user_id = Integer.parseInt(temp.split(";")[0]);
             key = temp.split(";")[1];
         }
@@ -32,6 +33,7 @@ public class Notes extends Application {
     public void start(Stage stage) throws Exception {
         Database database = new Database();
         String temp = database.getKey();
+        stages = new ArrayList<>();
         
         if (temp.equals("")) {
             startUp(stage, null);
@@ -56,12 +58,21 @@ public class Notes extends Application {
     void makeStage(Stage stage, Note note, int mode) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
         stage.initStyle(StageStyle.TRANSPARENT);
-
+        
         if (mode != 0) {
             Database database = new Database();
             note.setId(database.addNote(user_id, "", "", 1));
         }
+        
+        for (stageControl x : stages){
+            if (note.getId() == x.noteID()){
+                x.setFocus();
+                return;
+            }
+        }
 
+        stages.add(new stageControl(note, stage));
+        
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         stage.setScene(new Scene((Parent) loader.load()));
 

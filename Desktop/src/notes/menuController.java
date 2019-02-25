@@ -19,6 +19,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -68,7 +69,7 @@ public class menuController implements Initializable {
     @FXML
     private TextField email;
     @FXML
-    private TextField password;
+    private PasswordField password;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

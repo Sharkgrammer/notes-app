@@ -72,14 +72,14 @@ if($type > 2){
 	{
 		if(mysqli_num_rows($result) == 0)
 		{
-			//$type = 0;
+			$type = 0;
 			//echo ":(";
 		}
 		else
 		{
 			while($row = mysqli_fetch_assoc($result)){
 				if ($auth_key != $row['user_key']){
-					//$type = 0;
+					$type = 0;
 				}
 			}
 		}
@@ -262,7 +262,7 @@ if ($type == 1){
 		}
 	}
 }else{
-	echo "Error 404: Error not found";
+	echo "Authentication/Mismatch error";
 }
 mysqli_close($con);
 ?>
