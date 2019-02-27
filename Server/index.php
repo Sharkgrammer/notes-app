@@ -261,6 +261,11 @@ if ($type == 1){
 			}
 		}
 	}
+}elseif($type == 8){
+	$note = $con->real_escape_string(htmlspecialchars($_POST['note']));
+	$theme = $con->real_escape_string(htmlspecialchars($_POST['theme']));
+	$query = "update note set theme_id = '$theme' where note_id = '$note'";
+	mysqli_query($con, $query) or die(mysqli_error($con));
 }else{
 	echo "Authentication/Mismatch error";
 }

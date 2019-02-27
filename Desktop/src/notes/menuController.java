@@ -152,17 +152,19 @@ public class menuController implements Initializable {
             clickPane.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
-                    noteClick(ID);
+                    noteClick(ID, 1);
                 }
             });
         }
         clickPane = tempPane;
     }
 
-    private void noteClick(int ID) {
+    private void noteClick(int ID, int mode) {
         try {
             Theme theme = themes.get(notes.get(ID).getTheme_id() - 1);
-            (new Notes()).makeStage(new Stage(), notes.get(ID), 0);
+            if (mode != 0){
+                (new Notes()).makeStage(new Stage(), notes.get(ID), 0);
+            }
             menuPane.setStyle("-fx-background-color: " + theme.getSecondaryColour());
             menuMainPane.setStyle("-fx-background-color: " + theme.getPrimaryColour());
             titleBar.setStyle("-fx-background-color: " + theme.getPrimaryColour());
@@ -200,7 +202,6 @@ public class menuController implements Initializable {
     @FXML
     private void option(MouseEvent event) {
         //reload
-
     }
 
     @FXML
@@ -305,11 +306,12 @@ public class menuController implements Initializable {
         });
     }
 
-    public void update() {
+    public void update(int ID) {
         if (!notes.isEmpty()) {
             notes = database.retrieveAllNotes(notes.get(0).getUser_id());
             reload(notes);
         }
         Notes.themes = database.loadThemes();
+        noteClick(ID, 0);
     }
 }

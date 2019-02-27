@@ -8,6 +8,7 @@ public class stageControl {
     private Stage stage;
     private mainController mainCon = null;
     private menuController menuCon = null;
+    public static int passedByID = 0;
 
     public stageControl(Note note, Stage stage, mainController controller) {
         setNote(note);
@@ -60,9 +61,9 @@ public class stageControl {
 
     public void update() {
         if (menuCon == null) {
-            mainCon.update();
+            mainCon.update(note);
         } else {
-            menuCon.update();
+            menuCon.update(passedByID);
         }
     }
 
@@ -80,6 +81,10 @@ public class stageControl {
 
     public void setMenuCon(menuController menuCon) {
         this.menuCon = menuCon;
+    }
+    
+    public void setPassedByID(int aPassedByID) {
+        passedByID = aPassedByID;
     }
 
 }

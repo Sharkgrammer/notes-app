@@ -1,6 +1,7 @@
 package notes;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -9,17 +10,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -28,6 +31,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import static notes.Notes.stages;
 
 public class mainController implements Initializable {
@@ -36,7 +40,7 @@ public class mainController implements Initializable {
     Stage stage;
     Database database;
     private double sceneX, sceneY, alertX, alertY;
-    boolean saved = true;
+    boolean saved = true, optionOpen = false;
     private Theme theme;
 
     @FXML
@@ -68,7 +72,7 @@ public class mainController implements Initializable {
     public void start(Note note, Stage stage) {
         this.note = note;
         this.stage = stage;
-        
+
         theme = Notes.themes.get(note.getTheme_id() - 1);
         randomLocation();
         titleDrag();
@@ -115,14 +119,41 @@ public class mainController implements Initializable {
         titleText.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
         save.setImage(new Image("assets/save" + theme.getButtonColour() + ".png"));
         exit.setImage(new Image("assets/exit" + theme.getButtonColour() + ".png"));
-        option.setImage(new Image("assets/option"+ theme.getButtonColour() + ".png"));
+        option.setImage(new Image("assets/option" + theme.getButtonColour() + ".png"));
     }
 
     @FXML
     private void option(MouseEvent event) {
+        if (!optionOpen) {
+            optionOpen = true;
+            Stage stage = new Stage();
+            stage.setX(this.stage.getX());
+            stage.setY(this.stage.getY());
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.initStyle(StageStyle.TRANSPARENT);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("setting.fxml"));
+            try {
 
-        
-        runUpdates();
+                stage.setScene(new Scene((Parent) loader.load()));
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
+
+            settingController controller = loader.<settingController>getController();
+            controller.start(stage, note);
+
+            stage.getIcons().add(new Image("assets/logo.png"));
+            stage.show();
+            
+            stage.setOnHiding(new EventHandler<WindowEvent>() {
+
+                @Override
+                public void handle(WindowEvent event) {
+                    stage.close();
+                    optionOpen = false;
+                }
+            });
+        }
     }
 
     @FXML
@@ -225,14 +256,16 @@ public class mainController implements Initializable {
         });
 
     }
-    
-    private void runUpdates(){
+
+    private void runUpdates() {
         stages.stream().forEach((x) -> {
             x.update();
         });
     }
-    
-    public void update(){
+
+    public void update(Note note) {
+        this.note = note;
+        theme = Notes.themes.get(note.getTheme_id() - 1);
         cssRefresh();
     }
 
