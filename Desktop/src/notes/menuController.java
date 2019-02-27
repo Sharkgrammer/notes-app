@@ -23,11 +23,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import static notes.Notes.stages;
 
 public class menuController implements Initializable {
 
@@ -79,17 +81,19 @@ public class menuController implements Initializable {
     public void start(List<Note> notes, Stage stage) {
         this.notes = notes;
         this.stage = stage;
-        
+
         if (notes == null) {
             content.setVisible(false);
             logPane.setVisible(true);
             addPane.setVisible(false);
             optionPane.setVisible(false);
-        }else{
+        } else {
             reload(notes);
         }
-        
+
         menuPane.setStyle("-fx-background-color: #ffe900;");
+        menuMainPane.getStyleClass().add("border-main");
+        titleBar.getStyleClass().add("border-main");
         content.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         content.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         randomLocation();
@@ -112,23 +116,26 @@ public class menuController implements Initializable {
             Label name2 = new Label(), date2 = new Label();
             Pane clickPane2 = new Pane();
             menuPane.getChildren().add(clickPane2);
+            Theme theme = themes.get(note.getTheme_id() - 1);
 
             clickPane2.setLayoutX(clickPane.getLayoutX());
             clickPane2.setLayoutY(clickPane.getLayoutY() + 60);
             clickPane2.setPrefHeight(clickPane.getPrefHeight());
             clickPane2.setPrefWidth(clickPane.getPrefWidth());
-            clickPane2.setStyle("-fx-background-color: " + themes.get(note.getTheme_id() - 1).getPrimaryColour());
+            clickPane2.setStyle("-fx-background-color: " + theme.getPrimaryColour());
             clickPane2.getStyleClass().add("rounded");
             clickPane2.getStyleClass().add("border-main");
 
             clickPane2.getChildren().add(name2);
             clickPane2.getChildren().add(date2);
 
+            name2.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
             name2.setLayoutX(name.getLayoutX());
             name2.setLayoutY(name.getLayoutY());
             name2.setPrefHeight(name.getPrefHeight());
             name2.setPrefWidth(name.getPrefWidth());
 
+            date2.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
             date2.setLayoutX(date.getLayoutX());
             date2.setLayoutY(date.getLayoutY());
             date2.setPrefHeight(date.getPrefHeight());
@@ -159,6 +166,9 @@ public class menuController implements Initializable {
             menuPane.setStyle("-fx-background-color: " + theme.getSecondaryColour());
             menuMainPane.setStyle("-fx-background-color: " + theme.getPrimaryColour());
             titleBar.setStyle("-fx-background-color: " + theme.getPrimaryColour());
+            add.setImage(new Image("assets/add" + theme.getButtonColour() + ".png"));
+            exit.setImage(new Image("assets/exit" + theme.getButtonColour() + ".png"));
+            option.setImage(new Image("assets/option" + theme.getButtonColour() + ".png"));
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -180,19 +190,17 @@ public class menuController implements Initializable {
         //System.out.println("Add clicked");
         try {
             (new Notes()).makeStage(new Stage(), new Note(), 1);
+
+            runUpdates();
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
     }
-    
+
     @FXML
     private void option(MouseEvent event) {
         //reload
-        
-        if (!notes.isEmpty()){
-            notes = database.retrieveAllNotes(notes.get(0).getUser_id());
-            reload(notes);
-        }
+
     }
 
     @FXML
@@ -291,4 +299,17 @@ public class menuController implements Initializable {
         });
     }
 
+    private void runUpdates() {
+        stages.stream().forEach((x) -> {
+            x.update();
+        });
+    }
+
+    public void update() {
+        if (!notes.isEmpty()) {
+            notes = database.retrieveAllNotes(notes.get(0).getUser_id());
+            reload(notes);
+        }
+        Notes.themes = database.loadThemes();
+    }
 }

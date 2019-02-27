@@ -70,13 +70,12 @@ public class Notes extends Application {
                 return;
             }
         }
-
-        stages.add(new stageControl(note, stage));
         
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         stage.setScene(new Scene((Parent) loader.load()));
 
         mainController controller = loader.<mainController>getController();
+        stages.add(new stageControl(note, stage, controller));
         controller.start(note, stage);
 
         stage.getIcons().add(new Image("assets/logo.png"));
@@ -92,6 +91,7 @@ public class Notes extends Application {
 
         menuController controller = loader.<menuController>getController();
         controller.start(notes, stage);
+        stages.add(new stageControl(null, stage, controller));
 
         stage.getIcons().add(new Image("assets/logo.png"));
         stage.show();

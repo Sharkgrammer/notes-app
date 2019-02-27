@@ -22,11 +22,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import static notes.Notes.stages;
 
 public class mainController implements Initializable {
 
@@ -41,10 +43,6 @@ public class mainController implements Initializable {
     private ImageView exit;
     @FXML
     private Pane exitPane;
-    @FXML
-    private ImageView add;
-    @FXML
-    private Pane addPane;
     @FXML
     private ImageView option;
     @FXML
@@ -70,7 +68,8 @@ public class mainController implements Initializable {
     public void start(Note note, Stage stage) {
         this.note = note;
         this.stage = stage;
-        theme = Notes.themes.get( note.getTheme_id() - 1);
+        
+        theme = Notes.themes.get(note.getTheme_id() - 1);
         randomLocation();
         titleDrag();
         cssRefresh();
@@ -79,7 +78,7 @@ public class mainController implements Initializable {
         contentText.setText(note.getContent());
         contentText.requestFocus();
         contentText.wrapTextProperty().set(true);
-        
+
         System.out.println(theme.getName());
 
         ChangeListener savedSet = (ChangeListener<String>) (ObservableValue<? extends String> observableValue, String s, String s2) -> {
@@ -110,23 +109,20 @@ public class mainController implements Initializable {
     private void cssRefresh() {
         titleBar.setStyle("-fx-background-color: " + theme.getPrimaryColour());
         mainPane.setStyle("-fx-background-color: " + theme.getSecondaryColour());
+        mainPane.getStyleClass().add("border-main");
+        titleBar.getStyleClass().add("border-main");
         contentText.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
         titleText.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
+        save.setImage(new Image("assets/save" + theme.getButtonColour() + ".png"));
+        exit.setImage(new Image("assets/exit" + theme.getButtonColour() + ".png"));
+        option.setImage(new Image("assets/option"+ theme.getButtonColour() + ".png"));
     }
 
     @FXML
-    private void add(MouseEvent event) {
-        //System.out.println("Add clicked");
-        try {
-            (new Notes()).makeStage(new Stage(), new Note(), 1);
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
-        }
-    }
-    
-    @FXML
     private void option(MouseEvent event) {
+
         
+        runUpdates();
     }
 
     @FXML
@@ -136,6 +132,7 @@ public class mainController implements Initializable {
         note.setTitle(titleText.getText());
         database.updateNote(note);
         saved = true;
+        runUpdates();
     }
 
     @FXML
@@ -169,6 +166,7 @@ public class mainController implements Initializable {
         if (result.orElse(Not) == Delete) {
             //System.out.println("Exit clicked: Delete");
             database.deleteNote(note.getId());
+            runUpdates();
             stage.close();
         } else if (result.orElse(Not) == Hide) {
             //System.out.println("Exit clicked: Close");
@@ -176,17 +174,17 @@ public class mainController implements Initializable {
                 save(null);
             }
             //close the stage, remove it from the list
-            
+
             List<stageControl> list = Notes.stages;
-            
-            for (stageControl x : list){
-                if (x.noteID() == note.getId()){
+
+            for (stageControl x : list) {
+                if (x.noteID() == note.getId()) {
                     list.remove(x);
                     break;
                 }
             }
             Notes.stages = list;
-            
+
             stage.close();
         } else if (result.orElse(Not) == Min) {
             if (!saved) {
@@ -215,6 +213,27 @@ public class mainController implements Initializable {
             stage.setX(mouseEvent.getScreenX() + sceneX);
             stage.setY(mouseEvent.getScreenY() + sceneY);
         });
+
+        titleText.setOnMousePressed((MouseEvent mouseEvent) -> {
+            sceneX = stage.getX() - mouseEvent.getScreenX();
+            sceneY = stage.getY() - mouseEvent.getScreenY();
+        });
+
+        titleText.setOnMouseDragged((MouseEvent mouseEvent) -> {
+            stage.setX(mouseEvent.getScreenX() + sceneX);
+            stage.setY(mouseEvent.getScreenY() + sceneY);
+        });
+
+    }
+    
+    private void runUpdates(){
+        stages.stream().forEach((x) -> {
+            x.update();
+        });
+    }
+    
+    public void update(){
+        cssRefresh();
     }
 
 }

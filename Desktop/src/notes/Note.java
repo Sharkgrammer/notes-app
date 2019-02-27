@@ -18,7 +18,7 @@ public class Note {
         content = "";
         date = "";
         type = 0;
-        theme_id = 0;
+        theme_id = 1;
     }
 
     public int getId() {
