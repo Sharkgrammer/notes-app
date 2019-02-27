@@ -162,7 +162,7 @@ public class menuController implements Initializable {
     private void noteClick(int ID, int mode) {
         try {
             Theme theme = themes.get(notes.get(ID).getTheme_id() - 1);
-            if (mode != 0){
+            if (mode != 0) {
                 (new Notes()).makeStage(new Stage(), notes.get(ID), 0);
             }
             menuPane.setStyle("-fx-background-color: " + theme.getSecondaryColour());
@@ -201,7 +201,41 @@ public class menuController implements Initializable {
 
     @FXML
     private void option(MouseEvent event) {
-        //reload
+        //Exit
+
+        ButtonType Log = new ButtonType("Yes");
+        ButtonType No = new ButtonType("No");
+        Alert alert = new Alert(AlertType.NONE, "Logout?", Log, No);
+        alert.setX(stage.getX() - 50);
+        alert.setY(stage.getY() + 80);
+        alert.initStyle(StageStyle.UNDECORATED);
+        stage.setAlwaysOnTop(false);
+
+        alert.getDialogPane().setOnMousePressed((MouseEvent mouseEvent) -> {
+            alertX = alert.getX() - mouseEvent.getScreenX();
+            alertY = alert.getY() - mouseEvent.getScreenY();
+            alert.getDialogPane().setCursor(Cursor.MOVE);
+        });
+
+        alert.getDialogPane().setOnMouseReleased((MouseEvent mouseEvent) -> {
+            alert.getDialogPane().setCursor(Cursor.DEFAULT);
+        });
+
+        alert.getDialogPane().setOnMouseDragged((MouseEvent mouseEvent) -> {
+            alert.setX(mouseEvent.getScreenX() + alertX);
+            alert.setY(mouseEvent.getScreenY() + alertY);
+        });
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.orElse(No) == Log) {
+            database.setKey("");
+
+            stages.stream().forEach((x) -> {
+                x.close();
+            });
+        } else {
+            stage.setAlwaysOnTop(true);
+        }
     }
 
     @FXML

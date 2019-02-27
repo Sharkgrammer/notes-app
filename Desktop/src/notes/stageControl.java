@@ -21,6 +21,11 @@ public class stageControl {
         setStage(stage);
         setMenuCon(controller);
     }
+    
+    public stageControl(Note note, Stage stage) {
+        setNote(note);
+        setStage(stage);
+    }
 
     public Note getNote() {
         return note;
@@ -65,6 +70,10 @@ public class stageControl {
         } else {
             menuCon.update(passedByID);
         }
+    }
+    
+    public void close() {
+        stage.close();
     }
 
     public mainController getMainCon() {

@@ -145,7 +145,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
                 }).setCancelable(false).setNegativeButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //nothing, close
+                        dialog.cancel();
                     }
                 });
         //Creating dialog box
@@ -176,7 +176,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
     @Override
     public void onBackPressed() {
         if (!saved){
-            option(null);
+            save(null);
         }
         startActivity(new Intent(NoteActivity.this, MainActivity.class));
         this.finish();

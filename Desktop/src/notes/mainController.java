@@ -140,6 +140,7 @@ public class mainController implements Initializable {
             }
 
             settingController controller = loader.<settingController>getController();
+            stages.add(new stageControl(note, stage));
             controller.start(stage, note);
 
             stage.getIcons().add(new Image("assets/logo.png"));

@@ -1,7 +1,10 @@
 package com.shark.notes;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.List;
@@ -106,6 +110,27 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
+    }
+
+    public void option(View v){
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        SharedPreferences prefs = MainActivity.this.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("key", "0");
+                        editor.apply();
+
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        break;
+                }
+            }
+        };
+
+        new AlertDialog.Builder(this).setMessage("Logout?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+
     }
 
     @Override
