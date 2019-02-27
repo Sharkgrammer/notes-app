@@ -26,40 +26,6 @@ public class Database {
         key = context.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE).getString("key", "0");
     }
 
-    public List<Theme> loadThemes(){
-        List<Theme> themes = new ArrayList<>();
-        List<String> parms = new ArrayList<>();
-        parms.add("type");
-        parms.add("7");
-        String response = "";
-        try {
-            response = sendPost(parms);
-            //response = sendGet(parms);
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
-        }
-
-        Theme theme;
-        for (String x : response.split(";")){
-            String[] y = x.split(",");
-            theme = new Theme();
-
-            int yPointer = 0;
-            theme.setTheme_id(Integer.parseInt(y[yPointer++]));
-            theme.setName(y[yPointer++]);
-            theme.setPrimaryColour(y[yPointer++]);
-            theme.setSecondaryColour(y[yPointer++]);
-            theme.setTextColour(y[yPointer++]);
-            theme.setHintColour(y[yPointer++]);
-            theme.setAccentColour(y[yPointer++]);
-            theme.setButtonColour(y[yPointer]);
-
-            themes.add(theme);
-        }
-
-        return themes;
-    }
-
     public String login(String email, String password){
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -98,6 +64,30 @@ public class Database {
 
         System.out.println("Registered");
         return response.equals("Table Updated");
+    }
+
+    public int addNote(int user_id, String title, String content, int type) {
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("3");
+        parms.add("ID");
+        parms.add(String.valueOf(user_id));
+        parms.add("title");
+        parms.add(title);
+        parms.add("content");
+        parms.add(content);
+        parms.add("ntype");
+        parms.add(String.valueOf(type));
+        String response = "";
+        try {
+            response = sendPost(parms);
+            //response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        System.out.println("Note Added");
+        return Integer.valueOf(response);
     }
 
     public List<Note> retrieveAllNotes(int ID) {
@@ -161,30 +151,6 @@ public class Database {
         return response.equals("deleted");
     }
 
-    public int addNote(int user_id, String title, String content, int type) {
-        List<String> parms = new ArrayList<>();
-        parms.add("type");
-        parms.add("3");
-        parms.add("ID");
-        parms.add(String.valueOf(user_id));
-        parms.add("title");
-        parms.add(title);
-        parms.add("content");
-        parms.add(content);
-        parms.add("ntype");
-        parms.add(String.valueOf(type));
-        String response = "";
-        try {
-            response = sendPost(parms);
-            //response = sendGet(parms);
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
-        }
-
-        System.out.println("Note Added");
-        return Integer.valueOf(response);
-    }
-
     public void updateNote(Note note) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -205,6 +171,63 @@ public class Database {
         }
 
         System.out.println("Note Saved");
+    }
+
+    public List<Theme> loadThemes(){
+        List<Theme> themes = new ArrayList<>();
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("7");
+        String response = "";
+        try {
+            response = sendPost(parms);
+            //response = sendGet(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        Theme theme;
+        for (String x : response.split(";")){
+            String[] y = x.split(",");
+            theme = new Theme();
+
+            int yPointer = 0;
+            theme.setTheme_id(Integer.parseInt(y[yPointer++]));
+            theme.setName(y[yPointer++]);
+            theme.setPrimaryColour(y[yPointer++]);
+            theme.setSecondaryColour(y[yPointer++]);
+            theme.setTextColour(y[yPointer++]);
+            theme.setHintColour(y[yPointer++]);
+            theme.setAccentColour(y[yPointer++]);
+            theme.setButtonColour(y[yPointer]);
+
+            themes.add(theme);
+        }
+
+        return themes;
+    }
+
+    public void updateTheme(Note note){
+        List<String> parms = new ArrayList<>();
+        parms.add("type");
+        parms.add("8");
+        parms.add("note");
+        parms.add(String.valueOf(note.getId()));
+        parms.add("theme");
+        parms.add(String.valueOf(note.getTheme_id()));
+
+        System.out.println(String.valueOf(note.getTheme_id()) + "  " + String.valueOf(note.getId()));
+        String response = "";
+        try {
+            //response = sendPost(parms);
+            response = sendPost(parms);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+        System.out.println(response);
+
+        System.out.println("Note Theme Update");
     }
 
     private String sendGet(List<String> parms) throws Exception {

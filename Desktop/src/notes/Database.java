@@ -236,8 +236,6 @@ public class Database {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-        
-        System.out.println(response);
 
         System.out.println("Note Theme Update");
     }

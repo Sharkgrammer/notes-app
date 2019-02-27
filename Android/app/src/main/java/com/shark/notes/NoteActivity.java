@@ -1,6 +1,8 @@
 package com.shark.notes;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NoteActivity extends AppCompatActivity implements Serializable {
 
@@ -25,6 +29,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
     ImageView option, save, del;
     boolean saved = true;
     Theme theme;
+    List<Theme> themes = MainActivity.themes;
     ConstraintLayout noteLayContent, noteLayTitle;
 
     @Override
@@ -33,8 +38,8 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         setContentView(R.layout.activity_note);
         database = new Database(this);
         option = findViewById(R.id.option);
-        save = findViewById(R.id.Save);
-        del = findViewById(R.id.Exit);
+        save = findViewById(R.id.save);
+        del = findViewById(R.id.exit);
         title = findViewById(R.id.titleText);
         content = findViewById(R.id.contentText);
         noteLayContent = findViewById(R.id.noteLayContent);
@@ -48,7 +53,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         note.setId(Integer.parseInt((String) i.getSerializableExtra("noteID")));
         note.setUser_id(Integer.parseInt((String) i.getSerializableExtra("noteUser")));
         note.setTheme_id(Integer.parseInt((String) i.getSerializableExtra("noteTheme")));
-        theme = MainActivity.themes.get(note.getTheme_id() - 1);
+        theme = themes.get(note.getTheme_id() - 1);
         user_id = note.getUser_id();
 
         this.note = note;
@@ -89,6 +94,9 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         Window window = this.getWindow();
         window.setStatusBarColor(Color.parseColor(theme.getPrimaryColour()));
         noteLayContent.setBackgroundColor(Color.parseColor(theme.getSecondaryColour()));
+        option.setImageResource(getResourceId("option" + theme.getButtonColour(), "drawable"));
+        del.setImageResource(getResourceId("exit" + theme.getButtonColour(), "drawable"));
+        save.setImageResource(getResourceId("save" + theme.getButtonColour(), "drawable"));
     }
 
     public void add(View v) {
@@ -106,7 +114,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         }
     }
 
-    public void option(View v) {
+    public void save(View v) {
         Toast.makeText(getApplicationContext(),"Saved note " + note.getTitle(), Toast.LENGTH_SHORT).show();
         note.setTitle(title.getText().toString());
         note.setContent(content.getText().toString());
@@ -114,10 +122,55 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         saved = true;
     }
 
+    public void option(View v){
+        final int loc = themes.size() - 1;
+
+        CharSequence[] arr = new CharSequence[themes.size()];
+        for (int x = 0; x < themes.size(); x++){
+            arr[loc - x] = themes.get(x).getName();
+        }
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Theme picker").setSingleChoiceItems(arr, arr.length,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        note.setTheme_id((loc - arg1) + 1);
+                        database.updateTheme(note);
+                        theme = themes.get(loc - arg1);
+                        cssRefresh();
+                    }
+                }).setCancelable(false).setNegativeButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //nothing, close
+                    }
+                });
+        //Creating dialog box
+        AlertDialog dialog  = builder.create();
+        dialog.show();
+
+    }
+
     public void exit(View v) {
-        Toast.makeText(getApplicationContext(),"Deleted note " + note.getTitle(), Toast.LENGTH_SHORT).show();
-        database.deleteNote(note.getId());
-        startActivity(new Intent(NoteActivity.this, MainActivity.class));
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        Toast.makeText(getApplicationContext(),"Deleted note " + note.getTitle(), Toast.LENGTH_SHORT).show();
+                        database.deleteNote(note.getId());
+                        startActivity(new Intent(NoteActivity.this, MainActivity.class));
+                        break;
+                }
+            }
+        };
+
+        new AlertDialog.Builder(this).setMessage("Delete note " + note.getTitle() +"?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+
     }
 
     @Override
@@ -127,6 +180,16 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         }
         startActivity(new Intent(NoteActivity.this, MainActivity.class));
         this.finish();
+    }
+
+    private int getResourceId(String name, String res)
+    {
+        try {
+            return getResources().getIdentifier(name, res, getPackageName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
 }

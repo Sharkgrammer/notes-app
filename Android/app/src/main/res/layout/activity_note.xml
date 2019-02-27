@@ -10,10 +10,10 @@
     tools:context=".NoteActivity">
 
     <ImageView
-        android:id="@+id/Option"
+        android:id="@+id/option"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:onClick="add"
+        android:onClick="option"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.647"
@@ -23,7 +23,7 @@
         app:srcCompat="@drawable/optionblack" />
 
     <ImageView
-        android:id="@+id/Exit"
+        android:id="@+id/exit"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:onClick="exit"
@@ -36,10 +36,10 @@
         app:srcCompat="@drawable/exitblack" />
 
     <ImageView
-        android:id="@+id/Save"
+        android:id="@+id/save"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:onClick="option"
+        android:onClick="save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.802"
