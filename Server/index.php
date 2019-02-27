@@ -1,6 +1,13 @@
 <?php
-	
-$con = mysqli_connect("den1.mysql1.gear.host","note","Qr7I5!96q!69", "note");
+
+$creds = fgets(fopen("dbcreds.txt", "r")) or die("Unable to open file");
+
+$loc = explode(";", $creds)[0];
+$user = explode(";", $creds)[1];
+$pass = explode(";", $creds)[2];
+fclose($creds);
+
+$con = mysqli_connect($loc,$user,$pass,$user);
 if (mysqli_connect_errno($con)) {
     echo "Failed to connect to MySQL: " . mysqli_connect_error();
 }
