@@ -16,8 +16,5 @@ User passwords are hashed and actual note data is encrypted by the program for s
 ![Themes](https://i.imgur.com/GwNGoLq.png)
 
 # Android version
-![Login](https://i.imgur.com/egvS6Bj.png)
-![Menu](https://i.imgur.com/IJdYRVT.png)
-![Themes](https://i.imgur.com/iNt4FVp.png)
-![Notes](https://i.imgur.com/cKpJEAI.png)
-![Notes](https://i.imgur.com/e7FcfP4.png) ![Notes](https://i.imgur.com/EGnxVg8.png)
+![Android Main Screens](https://i.imgur.com/5RXbksr.png)
+![Android Notes](https://i.imgur.com/oBrC5HU.png)
