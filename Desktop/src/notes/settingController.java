@@ -75,6 +75,14 @@ public class settingController implements Initializable {
 
     @FXML
     private void exit(MouseEvent event) {
+        List<stageControl> list = Notes.stages;
+        for (stageControl x : list) {
+            if (x.getStage() == stage) {
+                list.remove(x);
+                break;
+            }
+        }
+        Notes.stages = list;
         stage.close();
     }
 

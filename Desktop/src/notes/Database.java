@@ -74,7 +74,6 @@ public class Database {
             System.out.println(ex.toString());
         }
 
-        System.out.println("Registered");
         return response.equals("Table Updated");
     }
     
@@ -98,7 +97,6 @@ public class Database {
             System.out.println(ex.toString());
         }
 
-        System.out.println("Note Added");
         return Integer.valueOf(response);
     }
 
@@ -123,7 +121,6 @@ public class Database {
 
         Note note;
         int noteid = 0;
-        //System.out.println(response);
         for (String noteStr : response.split("/split2/")) {
             note = new Note();
             int notePointer = 0;
@@ -139,8 +136,6 @@ public class Database {
 
             noteList.add(note);
         }
-
-        System.out.println("Notes Recieved");
 
         return noteList;
     }
@@ -175,9 +170,10 @@ public class Database {
         parms.add(note.getContent());
         parms.add("ntype");
         parms.add(String.valueOf(note.getType()));
+        String response = "";
         try {
             //response = sendPost(parms);
-            sendPost(parms);
+            response = sendPost(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -227,8 +223,6 @@ public class Database {
         parms.add(String.valueOf(note.getId()));
         parms.add("theme");
         parms.add(String.valueOf(note.getTheme_id()));
-        
-        System.out.println(String.valueOf(note.getTheme_id()) + "  " + String.valueOf(note.getId()));
         String response = "";
         try {
             //response = sendPost(parms);

@@ -240,7 +240,7 @@ public class menuController implements Initializable {
 
     @FXML
     private void exit(MouseEvent event) {
-        ButtonType Hide = new ButtonType("Close");
+        ButtonType Hide = new ButtonType("Close All");
         ButtonType Min = new ButtonType("Minimise");
         ButtonType Not = new ButtonType("Nothing");
         Alert alert = new Alert(AlertType.NONE, "Exit Options", Hide, Min, Not);
@@ -266,7 +266,9 @@ public class menuController implements Initializable {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.orElse(Not) == Hide) {
-            stage.close();
+            stages.stream().forEach((x) -> {
+                x.close();
+            });
         } else if (result.orElse(Not) == Min) {
             stage.setIconified(true);
         } else {

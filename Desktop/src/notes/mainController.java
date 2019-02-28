@@ -83,8 +83,6 @@ public class mainController implements Initializable {
         contentText.requestFocus();
         contentText.wrapTextProperty().set(true);
 
-        System.out.println(theme.getName());
-
         ChangeListener savedSet = (ChangeListener<String>) (ObservableValue<? extends String> observableValue, String s, String s2) -> {
             saved = false;
         };

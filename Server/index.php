@@ -55,6 +55,41 @@ function generateRandomString($length) {
     return $tempString;
 }
 
+function pkcs7_pad($data, $size)
+{
+    $length = $size - strlen($data) % $size;
+    return $data . str_repeat(chr($length), $length);
+}
+
+function pkcs7_unpad($data)
+{
+    return substr($data, 0, -ord($data[strlen($data) - 1]));
+}
+
+function encrypt($data, $encryption_key, $iv) {
+	$enc_data = openssl_encrypt(
+		pkcs7_pad($data, 16), // padded data
+		'AES-256-CBC',        // cipher and mode
+		$encryption_key,      // secret key
+		0,                    // options (not used)
+		$iv                   // initialisation vector
+	);
+
+	return $enc_data;
+}
+
+function decrypt($data, $encryption_key, $iv) {
+	$decrypt = pkcs7_unpad(openssl_decrypt(
+		$data,
+		'AES-256-CBC',
+		$encryption_key,
+		0,
+		$iv
+	));
+
+	return $decrypt;
+}
+
 $dbstring = $_GET['key'];
 if (strlen($dbstring) < 1){
 	$dbstring = $_POST['key'];
@@ -198,13 +233,17 @@ if ($type == 1){
 		{
 			while($row = mysqli_fetch_assoc($result))
 			{
+				//so for some reason key doesnt need to be decoded
+				$enkey = $row['encrptKey'];
+				$enIv = base64_decode($row['encrptIv']);
+
 				echo $row['note_id'];
 				echo "/split1/";
 				echo $row['user_id'];
 				echo "/split1/";
-				echo $row['note_title'];
+				echo decrypt($row['note_title'], $enkey ,$enIv);
 				echo "/split1/";
-				echo $row['note_content'];
+				echo decrypt($row['note_content'], $enkey ,$enIv);
 				echo "/split1/";
 				echo $row['note_date'];
 				echo "/split1/";
@@ -226,10 +265,18 @@ if ($type == 1){
 	$title = $con->real_escape_string(htmlspecialchars($_POST['title']));
 	$content = $con->real_escape_string(htmlspecialchars($_POST['content']));
 	$content = str_replace("\\n", "/para/", $content);
-	echo $content;
+	
+	$enkey = openssl_random_pseudo_bytes(32, $strong);	
+	$enIv = openssl_random_pseudo_bytes(16, $strong);
+	$title = encrypt($title, $enkey, $enIv);
+	$content = encrypt($content, $enkey, $enIv);
+	
+	$enKey = base64_encode($enKey);
+	$enIv = base64_encode($enIv);
+	
 	$type = $con->real_escape_string(htmlspecialchars($_POST['ntype']));
 	$query = "update note set note_title = '$title', 
-	note_content = '$content', note_type = '$type' where note_id = '$id'";
+	note_content = '$content', note_type = '$type', encrptKey = '$enkey', encrptIv = '$enIv' where note_id = '$id'";
 	mysqli_query($con, $query) or die(mysqli_error($con));
 }elseif($type == 7){
 	$query = "select * from theme";

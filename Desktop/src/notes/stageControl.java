@@ -65,9 +65,9 @@ public class stageControl {
     }
 
     public void update() {
-        if (menuCon == null) {
+        if (mainCon != null) {
             mainCon.update(note);
-        } else {
+        } else if(menuCon != null) {
             menuCon.update(passedByID);
         }
     }
