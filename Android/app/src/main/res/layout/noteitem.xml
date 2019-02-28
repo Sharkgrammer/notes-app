@@ -18,13 +18,14 @@
         tools:layout_editor_absoluteY="5dp" />
 
     <LinearLayout
-        android:background="@drawable/shadowbg"
+        android:id="@+id/layInt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="20dp"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
+        android:background="@drawable/shadowbg"
+        android:orientation="horizontal"
+        android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,20 +34,20 @@
         <TextView
             android:id="@+id/noteTitle"
             android:layout_width="wrap_content"
-            android:textColor="@color/textColour"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Note Title"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textColor="@color/textColour" />
 
         <TextView
             android:id="@+id/noteDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/textColour"
             android:layout_weight="1"
             android:text="Note Date"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textColor="@color/textColour" />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

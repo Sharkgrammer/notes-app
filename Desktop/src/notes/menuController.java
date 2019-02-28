@@ -38,6 +38,7 @@ public class menuController implements Initializable {
     Database database;
     private double sceneX, sceneY, alertX, alertY;
     boolean saved = true;
+    int user_id;
     List<Theme> themes = Notes.themes;
 
     @FXML
@@ -72,15 +73,18 @@ public class menuController implements Initializable {
     private TextField email;
     @FXML
     private PasswordField password;
+    @FXML
+    private Label loginLabel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         database = new Database();
     }
 
-    public void start(List<Note> notes, Stage stage) {
+    public void start(List<Note> notes, Stage stage, int ID) {
         this.notes = notes;
         this.stage = stage;
+        this.user_id = ID;
 
         if (notes == null) {
             content.setVisible(false);
@@ -111,52 +115,55 @@ public class menuController implements Initializable {
         Note note;
         menuPane.getChildren().clear();
         Pane tempPane = clickPane;
-        for (int x = notes.size() - 1; x >= 0; x--) {
-            note = notes.get(x);
-            Label name2 = new Label(), date2 = new Label();
-            Pane clickPane2 = new Pane();
-            menuPane.getChildren().add(clickPane2);
-            Theme theme = themes.get(note.getTheme_id() - 1);
 
-            clickPane2.setLayoutX(clickPane.getLayoutX());
-            clickPane2.setLayoutY(clickPane.getLayoutY() + 60);
-            clickPane2.setPrefHeight(clickPane.getPrefHeight());
-            clickPane2.setPrefWidth(clickPane.getPrefWidth());
-            clickPane2.setStyle("-fx-background-color: " + theme.getPrimaryColour());
-            clickPane2.getStyleClass().add("rounded");
-            clickPane2.getStyleClass().add("border-main");
+        if (!notes.isEmpty()) {
+            for (int x = notes.size() - 1; x >= 0; x--) {
+                note = notes.get(x);
+                Label name2 = new Label(), date2 = new Label();
+                Pane clickPane2 = new Pane();
+                menuPane.getChildren().add(clickPane2);
+                Theme theme = themes.get(note.getTheme_id() - 1);
 
-            clickPane2.getChildren().add(name2);
-            clickPane2.getChildren().add(date2);
+                clickPane2.setLayoutX(clickPane.getLayoutX());
+                clickPane2.setLayoutY(clickPane.getLayoutY() + 60);
+                clickPane2.setPrefHeight(clickPane.getPrefHeight());
+                clickPane2.setPrefWidth(clickPane.getPrefWidth());
+                clickPane2.setStyle("-fx-background-color: " + theme.getPrimaryColour() + "; -fx-border-color: " + theme.getTextColour());
+                clickPane2.getStyleClass().add("rounded");
+                clickPane2.getStyleClass().add("border-main");
 
-            name2.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
-            name2.setLayoutX(name.getLayoutX());
-            name2.setLayoutY(name.getLayoutY());
-            name2.setPrefHeight(name.getPrefHeight());
-            name2.setPrefWidth(name.getPrefWidth());
+                clickPane2.getChildren().add(name2);
+                clickPane2.getChildren().add(date2);
 
-            date2.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
-            date2.setLayoutX(date.getLayoutX());
-            date2.setLayoutY(date.getLayoutY());
-            date2.setPrefHeight(date.getPrefHeight());
-            date2.setPrefWidth(date.getPrefWidth());
+                name2.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
+                name2.setLayoutX(name.getLayoutX());
+                name2.setLayoutY(name.getLayoutY());
+                name2.setPrefHeight(name.getPrefHeight());
+                name2.setPrefWidth(name.getPrefWidth());
 
-            name = name2;
-            date = date2;
-            clickPane = clickPane2;
+                date2.setStyle("-fx-prompt-text-fill: " + theme.getHintColour() + ";-fx-text-fill: " + theme.getTextColour());
+                date2.setLayoutX(date.getLayoutX());
+                date2.setLayoutY(date.getLayoutY());
+                date2.setPrefHeight(date.getPrefHeight());
+                date2.setPrefWidth(date.getPrefWidth());
 
-            //System.out.println(note.getTitle() + "  " + note.getList_id() + "  " + x);
-            name.setText(note.getTitle());
-            date.setText(note.getDate());
-            final int ID = note.getList_id();
-            clickPane.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent mouseEvent) {
-                    noteClick(ID, 1);
-                }
-            });
+                name = name2;
+                date = date2;
+                clickPane = clickPane2;
+
+                //System.out.println(note.getTitle() + "  " + note.getList_id() + "  " + x);
+                name.setText(note.getTitle());
+                date.setText(note.getDate());
+                final int ID = note.getList_id();
+                clickPane.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        noteClick(ID, 1);
+                    }
+                });
+            }
+            clickPane = tempPane;
         }
-        clickPane = tempPane;
     }
 
     private void noteClick(int ID, int mode) {
@@ -192,7 +199,6 @@ public class menuController implements Initializable {
         //System.out.println("Add clicked");
         try {
             (new Notes()).makeStage(new Stage(), new Note(), 1);
-
             runUpdates();
         } catch (Exception ex) {
             System.out.println(ex.toString());
@@ -283,7 +289,7 @@ public class menuController implements Initializable {
         String Password = password.getText();
 
         if (Email.isEmpty() || Password.isEmpty()) {
-
+            loginLabel.setText("Fields empty");
         } else {
             String ans = database.login(Email, Password);
             if (!ans.isEmpty() && !ans.equals("Error")) {
@@ -295,7 +301,7 @@ public class menuController implements Initializable {
                     System.out.println(ex.toString());
                 }
             } else {
-                System.out.println("Oof");
+                loginLabel.setText("Incorrect Email or password");
             }
         }
 
@@ -307,14 +313,14 @@ public class menuController implements Initializable {
         String Password = password.getText();
 
         if (Email.isEmpty() || Password.isEmpty()) {
-
+            loginLabel.setText("Fields empty");
         } else {
             Boolean ans = database.register(Email, Password);
 
             if (ans) {
-                System.out.println("Yeetus");
+                loginLabel.setText("Register success, please login");
             } else {
-                System.out.println("Oof");
+                loginLabel.setText("Email may be in use, try again");
             }
         }
     }
@@ -343,11 +349,10 @@ public class menuController implements Initializable {
     }
 
     public void update(int ID) {
+        notes = database.retrieveAllNotes(user_id);
+        reload(notes);
         if (!notes.isEmpty()) {
-            notes = database.retrieveAllNotes(notes.get(0).getUser_id());
-            reload(notes);
+            noteClick(ID, 0);
         }
-        Notes.themes = database.loadThemes();
-        noteClick(ID, 0);
     }
 }

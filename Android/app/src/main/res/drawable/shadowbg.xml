@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item >
-        <shape
-            android:shape="rectangle">
-            <solid android:color="@color/botColour" />
-
-        </shape>
-    </item>
     <item android:right="15dp" android:left="15dp">
         <shape
             android:shape="rectangle">
-            <stroke android:width="1dip" android:color="@android:color/black"/>
-            <solid android:color="@color/topColour"/>
+            <stroke android:width="1dip" android:color="@android:color/black" android:id="@+id/contentSolidBorder"/>
+            <solid android:color="@android:color/white" android:id="@+id/contentSolidInt"/>
             <corners android:radius="50dp"/>
         </shape>
     </item>

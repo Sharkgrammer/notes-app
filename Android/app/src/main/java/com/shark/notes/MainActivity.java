@@ -6,16 +6,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -71,12 +70,18 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         for (int i = 0; i < notes.size(); i++) {
             note = notes.get(i);
             Child = LayoutInflater.from(this).inflate(R.layout.noteitem, null);
+            Theme locTheme = themes.get(note.getTheme_id() - 1);
+            LinearLayout layInt = Child.findViewById(R.id.layInt);
+            Drawable Drawable = layInt.getBackground();
+            //layInt.setBackgroundColor(Color.parseColor(locTheme.getPrimaryColour()));
+            Drawable.setColorFilter(Color.parseColor(locTheme.getPrimaryColour()), PorterDuff.Mode.MULTIPLY);
 
-            //Child.setBackgroundColor(Color.parseColor(themes.get(note.getTheme_id() - 1).getSecondaryColour()));
-            //shadowbg sets the colour from xml, make a fix for this later
-
-            ((TextView) Child.findViewById(R.id.noteTitle)).setText(note.getTitle());
-            ((TextView) Child.findViewById(R.id.noteDate)).setText(note.getDate());
+            TextView title = (TextView) Child.findViewById(R.id.noteTitle);
+            TextView date = (TextView) Child.findViewById(R.id.noteDate);
+            title.setText(note.getTitle());
+            date.setText(note.getDate());
+            title.setTextColor(Color.parseColor(locTheme.getTextColour()));
+            date.setTextColor(Color.parseColor(locTheme.getTextColour()));
 
             final TextView ID = (TextView) Child.findViewById(R.id.noteid);
             Child.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +99,15 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 }
             });
         }
+
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout lay = new LinearLayout(MainActivity.this);
+                lay.setMinimumHeight(50);
+                layNotes.addView(lay);
+            }
+        });
     }
 
     public void add(View v) {

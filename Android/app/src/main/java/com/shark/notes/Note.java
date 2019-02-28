@@ -80,7 +80,7 @@ public class Note {
     private String htmlParser(String text) {
         String[] textArr = text.split("&");
         for (String x : textArr) {
-            try{
+            try {
                 x = x.split(";")[0];
                 switch (x) {
                     case "amp":
@@ -96,10 +96,17 @@ public class Note {
                         text = text.replace("&gt;", ">");
                         break;
                 }
-                textArr = text.split("@");
-            }catch(Exception e){
+            } catch (Exception e) {
                 //
             }
+        }
+
+        if (text.contains("\\\'")){
+            text = text.replace("\\\'", "\'");
+        }
+
+        if (text.contains("\\\\")){
+            text = text.replace("\\\\", "\\");
         }
 
         return text;

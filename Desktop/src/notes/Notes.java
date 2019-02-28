@@ -13,8 +13,6 @@ import javafx.stage.StageStyle;
 public class Notes extends Application {
 
     private int user_id = 0;
-    private String email;
-    private String key;
     public static List<Theme> themes;
     public static List<stageControl> stages;
     
@@ -25,7 +23,6 @@ public class Notes extends Application {
         if (!temp.equals("")) {
             themes = database.loadThemes();
             user_id = Integer.parseInt(temp.split(";")[0]);
-            key = temp.split(";")[1];
         }
     }
 
@@ -39,7 +36,6 @@ public class Notes extends Application {
             startUp(stage, null);
         } else {
             user_id = Integer.parseInt(temp.split(";")[0]);
-            key = temp.split(";")[1];
             
             List<Note> noteList = database.retrieveAllNotes(user_id);
             startUp(stage, noteList);
@@ -64,7 +60,7 @@ public class Notes extends Application {
             note.setId(database.addNote(user_id, "", "", 1));
         }
         
-        for (stageControl x : stages){
+         for (stageControl x : stages){
             if (note.getId() == x.noteID()){
                 x.setFocus();
                 return;
@@ -90,9 +86,9 @@ public class Notes extends Application {
         stage.setScene(new Scene((Parent) loader.load()));
 
         menuController controller = loader.<menuController>getController();
-        controller.start(notes, stage);
+        controller.start(notes, stage, user_id);
         stages.add(new stageControl(null, stage, controller));
-
+        
         stage.getIcons().add(new Image("assets/logo.png"));
         stage.show();
     }

@@ -96,10 +96,17 @@ public class Note {
                         text = text.replace("&gt;", ">");
                         break;
                 }
-                textArr = text.split("@");
             } catch (Exception e) {
                 //
             }
+        }
+        
+        if (text.contains("\\\'")){
+            text = text.replace("\\\'", "\'");
+        }
+        
+        if (text.contains("\\\\")){
+            text = text.replace("\\\\", "\\");
         }
 
         return text;

@@ -55,12 +55,9 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
         note.setTheme_id(Integer.parseInt((String) i.getSerializableExtra("noteTheme")));
         theme = themes.get(note.getTheme_id() - 1);
         user_id = note.getUser_id();
-
         this.note = note;
-
         title.setText(note.getTitle());
         content.setText(note.getContent());
-
         cssRefresh();
 
         TextWatcher savedSet = new TextWatcher() {
@@ -124,12 +121,10 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
 
     public void option(View v){
         final int loc = themes.size() - 1;
-
         CharSequence[] arr = new CharSequence[themes.size()];
         for (int x = 0; x < themes.size(); x++){
             arr[loc - x] = themes.get(x).getName();
         }
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Theme picker").setSingleChoiceItems(arr, arr.length,
@@ -142,16 +137,16 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
                         theme = themes.get(loc - arg1);
                         cssRefresh();
                     }
-                }).setCancelable(false).setNegativeButton("Okay", new DialogInterface.OnClickListener() {
+                }).setCancelable(true).setNegativeButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        save(null);
                         dialog.cancel();
                     }
                 });
         //Creating dialog box
         AlertDialog dialog  = builder.create();
         dialog.show();
-
     }
 
     public void exit(View v) {
@@ -163,7 +158,7 @@ public class NoteActivity extends AppCompatActivity implements Serializable {
                     case DialogInterface.BUTTON_POSITIVE:
                         Toast.makeText(getApplicationContext(),"Deleted note " + note.getTitle(), Toast.LENGTH_SHORT).show();
                         database.deleteNote(note.getId());
-                        startActivity(new Intent(NoteActivity.this, MainActivity.class));
+                        onBackPressed();
                         break;
                 }
             }

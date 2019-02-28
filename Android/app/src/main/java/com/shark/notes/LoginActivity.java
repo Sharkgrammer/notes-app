@@ -28,20 +28,20 @@ public class LoginActivity extends AppCompatActivity {
                 if (txtEmail.getText().toString().equals("") || txtPassword.getText().toString().equals("")){
                     txtEmail.setText("");
                     txtPassword.setText("");
-                    Toast.makeText(getApplicationContext(),"Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Fields empty", Toast.LENGTH_SHORT).show();
                 }else{
                     String Temp = database.login(txtEmail.getText().toString(), txtPassword.getText().toString());
-                    if(Temp.equals("")){
-                        txtEmail.setText("");
-                        txtPassword.setText("");
-                        Toast.makeText(getApplicationContext(),"Error", Toast.LENGTH_SHORT).show();
-                    }else{
+                    if (!Temp.isEmpty() && !Temp.equals("Error")) {
                         SharedPreferences prefs = LoginActivity.this.getSharedPreferences("com.shark.notes", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("key", Temp);
                         editor.apply();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
+                    }else{
+                        txtEmail.setText("");
+                        txtPassword.setText("");
+                        Toast.makeText(getApplicationContext(),"Incorrect Email or password", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -53,15 +53,15 @@ public class LoginActivity extends AppCompatActivity {
                 if (txtEmail.getText().toString().equals("") || txtPassword.getText().toString().equals("")){
                     txtEmail.setText("");
                     txtPassword.setText("");
-                    Toast.makeText(getApplicationContext(),"Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Fields empty", Toast.LENGTH_SHORT).show();
                 }else{
                     boolean Temp = database.register(txtEmail.getText().toString(), txtPassword.getText().toString());
                     if(!Temp){
                         txtEmail.setText("");
                         txtPassword.setText("");
-                        Toast.makeText(getApplicationContext(),"Error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"Email may be in use, try again", Toast.LENGTH_SHORT).show();
                     }else{
-                        Toast.makeText(getApplicationContext(),"Account registered, please login!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"Register success, please login", Toast.LENGTH_SHORT).show();
                     }
                 }
             }

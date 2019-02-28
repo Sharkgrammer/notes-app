@@ -53,8 +53,6 @@ public class Database {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-
-        System.out.println("Login");
         return response;
     }
 
@@ -154,7 +152,6 @@ public class Database {
             System.out.println(ex.toString());
         }
 
-        System.out.println("Note Deleted");
         return response.equals("deleted");
     }
 
