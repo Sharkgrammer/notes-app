@@ -257,6 +257,7 @@ public class mainController implements Initializable {
     }
 
     private void runUpdates() {
+        stages.get(0).setPassedByID(note.getList_id());
         stages.stream().forEach((x) -> {
             x.update();
         });

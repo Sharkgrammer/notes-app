@@ -174,8 +174,6 @@ public class Database {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-
-        System.out.println("Note Saved");
     }
     
     public List<Theme> loadThemes(){
@@ -308,9 +306,6 @@ public class Database {
                 response.append(inputLine);
             }
         }
-
-        //print result
-        //System.out.println(response.toString());
         return response.toString();
     }
 
