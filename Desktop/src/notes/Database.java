@@ -227,8 +227,6 @@ public class Database {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-
-        System.out.println("Note Theme Update");
     }
 
     private String sendPost(List<String> parms) throws Exception {
