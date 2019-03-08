@@ -79,6 +79,7 @@ function encrypt($data, $encryption_key, $iv) {
 }
 
 function decrypt($data, $encryption_key, $iv) {
+	///echo $data;
 	$decrypt = pkcs7_unpad(openssl_decrypt(
 		$data,
 		'AES-256-CBC',
@@ -233,8 +234,7 @@ if ($type == 1){
 		{
 			while($row = mysqli_fetch_assoc($result))
 			{
-				//so for some reason key doesnt need to be decoded
-				$enkey = $row['encrptKey'];
+				$enkey = base64_decode($row['encrptKey']);
 				$enIv = base64_decode($row['encrptIv']);
 
 				echo $row['note_id'];
@@ -265,19 +265,20 @@ if ($type == 1){
 	$title = $con->real_escape_string(htmlspecialchars($_POST['title']));
 	$content = $con->real_escape_string(htmlspecialchars($_POST['content']));
 	$content = str_replace("\\n", "/para/", $content);
-	
-	$enkey = openssl_random_pseudo_bytes(32, $strong);	
-	$enIv = openssl_random_pseudo_bytes(16, $strong);
-	$title = encrypt($title, $enkey, $enIv);
-	$content = encrypt($content, $enkey, $enIv);
-	
-	$enKey = base64_encode($enKey);
-	$enIv = base64_encode($enIv);
-	
 	$type = $con->real_escape_string(htmlspecialchars($_POST['ntype']));
-	$query = "update note set note_title = '$title', 
-	note_content = '$content', note_type = '$type', encrptKey = '$enkey', encrptIv = '$enIv' where note_id = '$id'";
-	mysqli_query($con, $query) or die(mysqli_error($con));
+	$error = 0;
+	do{
+		$enKey = openssl_random_pseudo_bytes(32);	
+		$enIv = openssl_random_pseudo_bytes(16);
+		$titleEn = encrypt($title, $enKey, $enIv);
+		$contentEn = encrypt($content, $enKey, $enIv);
+		$enKeyBase = base64_encode($enKey);
+		$enIvBase = base64_encode($enIv);
+		
+		$query = "update note set note_title = '$titleEn', note_content = '$contentEn', note_type = '$type', encrptKey = '$enKeyBase', encrptIv = '$enIvBase' where note_id = '$id'";
+		$error = mysqli_query($con, $query);
+	}while($error != 1);
+	
 }elseif($type == 7){
 	$query = "select * from theme";
 	
