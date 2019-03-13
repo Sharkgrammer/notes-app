@@ -1,0 +1,7 @@
+
+
+Version:	3.12
+CmdLine:	C:\Users\gills\Documents\Notes\Application Files\Version 1\Notes.exe --l4j-debug
+WOW64:		yes
+Create mutex:	Notes
+Error:		Instance already exists.

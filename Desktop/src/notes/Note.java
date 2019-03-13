@@ -10,6 +10,7 @@ public class Note {
     private String date;
     private int type;
     private int theme_id;
+    private int local_id;
 
     public Note() {
         id = 0;
@@ -19,6 +20,7 @@ public class Note {
         date = "";
         type = 0;
         theme_id = 1;
+        local_id = 0;
     }
 
     public int getId() {
@@ -118,5 +120,13 @@ public class Note {
 
     public void setTheme_id(int theme_id) {
         this.theme_id = theme_id;
+    }
+
+    public int getLocal_id() {
+        return local_id;
+    }
+
+    public void setLocal_id(int local_id) {
+        this.local_id = local_id;
     }
 }
