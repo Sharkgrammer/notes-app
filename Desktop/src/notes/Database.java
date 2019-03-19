@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import static java.lang.Runtime.getRuntime;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.*;
@@ -33,6 +34,8 @@ public class Database {
     private final String PASS = "noteroot";
     private Connection conn;
     private String key = "0";
+    private final String url = "http://notesapp.gearhostpreview.com";
+    private String modUrl = "notesapp.gearhostpreview.com";
 
     public Database() {
         Path path = Paths.get(dir);
@@ -55,14 +58,6 @@ public class Database {
     }
 
     public String login(String email, String password) {
-        return login(email, password, false);
-    }
-
-    public String login(String email, String password, int local) {
-        return login(email, password, local == 0);
-    }
-
-    private String login(String email, String password, boolean local) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
         parms.add("1");
@@ -72,11 +67,7 @@ public class Database {
         parms.add(password);
         String response = "";
         try {
-            if (local) {
-                response = sendLocal(parms);
-            } else {
-                response = sendPost(parms);
-            }
+            response = sendPost(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -103,6 +94,14 @@ public class Database {
     }
 
     public int addNote(int user_id, String title, String content, int type) {
+        return addNote(user_id, title, content, type, false, 1, 0, "");
+    }
+
+    public int addNoteLocal(int user_id, String title, String content, int type, int theme, int note_id, String date) {
+        return addNote(user_id, title, content, type, true, theme, note_id, date);
+    }
+
+    private int addNote(int user_id, String title, String content, int type, boolean local, int theme, int note_id, String date) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
         parms.add("3");
@@ -114,9 +113,19 @@ public class Database {
         parms.add(content);
         parms.add("ntype");
         parms.add(String.valueOf(type));
+        parms.add("theme");
+        parms.add(String.valueOf(theme));
+        parms.add("noteID");
+        parms.add(String.valueOf(note_id));
+        parms.add("date");
+        parms.add(date);
         String response = "";
         try {
-            response = sendPost(parms);
+            if (local) {
+                response = sendLocal(parms);
+            } else {
+                response = sendPost(parms);
+            }
             //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
@@ -144,6 +153,8 @@ public class Database {
             return noteList;
         }
 
+        flushLocalDatabase(true);
+
         Note note;
         int noteid = 0;
         for (String noteStr : response.split("/split2/")) {
@@ -158,7 +169,7 @@ public class Database {
             note.setDate(toVisualDate(noteArr[notePointer++], "-"));
             note.setType(Integer.valueOf(noteArr[notePointer++]));
             note.setTheme_id(Integer.valueOf(noteArr[notePointer++]));
-
+            note.setLocal_id(addNoteLocal(note.getUser_id(), note.getTitle(), note.getContent(), note.getType(), note.getTheme_id(), note.getId(), note.getDate()));
             noteList.add(note);
         }
 
@@ -199,7 +210,11 @@ public class Database {
         String response = "";
         try {
             //response = sendPost(parms);
-            response = sendPost(parms);
+            if (note.getId() == 0){
+                response = sendLocal(parms);
+            }else{
+                response = sendPost(parms);
+            }
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -213,10 +228,11 @@ public class Database {
         String response = "";
         try {
             response = sendPost(parms);
-            //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
+
+        flushLocalDatabase(false);
 
         Theme theme;
         for (String x : response.split(";")) {
@@ -232,6 +248,31 @@ public class Database {
             theme.setHintColour(y[yPointer++]);
             theme.setAccentColour(y[yPointer++]);
             theme.setButtonColour(y[yPointer++]);
+
+            try {
+                parms = new ArrayList<>();
+                //the first one doesn't matter for this internal call
+                parms.add("f");
+                parms.add("20");
+                parms.add("f");
+                parms.add(theme.getPrimaryColour());
+                parms.add("f");
+                parms.add(theme.getSecondaryColour());
+                parms.add("f");
+                parms.add(theme.getTextColour());
+                parms.add("f");
+                parms.add(theme.getHintColour());
+                parms.add("f");
+                parms.add(theme.getAccentColour());
+                parms.add("f");
+                parms.add(theme.getButtonColour());
+                parms.add("f");
+                parms.add(theme.getName());
+
+                sendLocal(parms);
+            } catch (Exception e) {
+                //hmm
+            }
 
             themes.add(theme);
         }
@@ -257,12 +298,16 @@ public class Database {
     }
 
     private String sendPost(List<String> parms) throws Exception {
-        sendLocal(parms);
+        Process process = getRuntime().exec("ping " + modUrl);
+        int connected = process.waitFor();
+        if (connected != 0) {
+            return sendLocal(parms);
+        }
+
         parms.add("key");
         parms.add(key);
 
-        String obj = "http://notesapp.gearhostpreview.com";
-        URL url = new URL(obj);
+        URL obj = new URL(url);
         String data = "";
         StringBuilder response = new StringBuilder();
 
@@ -275,7 +320,7 @@ public class Database {
 
         try {
             //System.out.println(data);
-            URLConnection conn = url.openConnection();
+            URLConnection conn = obj.openConnection();
             conn.setDoOutput(true);
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write(data);
@@ -299,10 +344,14 @@ public class Database {
     }
 
     private String sendGet(List<String> parms) throws Exception {
+        Process process = getRuntime().exec("ping " + modUrl);
+        int connected = process.waitFor();
+        if (connected != 0) {
+            return sendLocal(parms);
+        }
+
         parms.add("key");
         parms.add(key);
-
-        String url = "http://notesapp.gearhostpreview.com?";
 
         String urlParameters = "";
 
@@ -313,10 +362,10 @@ public class Database {
             urlParameters += parms.get(x) + "=" + parms.get(x + 1);
         }
 
-        url += urlParameters;
+        String urlGet = url + "?" + urlParameters;
 
         //System.out.println(url);
-        URL obj = new URL(url);
+        URL obj = new URL(urlGet);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
         // optional default is GET
@@ -338,6 +387,28 @@ public class Database {
         return response.toString();
     }
 
+    private void flushLocalDatabase(boolean note) {
+        try {
+            Statement query = conn.createStatement();
+            String sql = "";
+            if (note) {
+                sql = "delete from note";
+                query.execute(sql);
+
+                sql = "ALTER TABLE note ALTER COLUMN local_id RESTART WITH 1";
+                query.execute(sql);
+            } else {
+                sql = "delete from theme";
+                query.execute(sql);
+
+                sql = "ALTER TABLE theme ALTER COLUMN theme_id RESTART WITH 1";
+                query.execute(sql);
+            }
+        } catch (Exception e) {
+            //shrug face
+        }
+    }
+
     private String sendLocal(List<String> parms) throws Exception {
         //Local database handler
         //To make my life easier it'll be modeled off of the PHP file
@@ -357,32 +428,55 @@ public class Database {
         Statement query;
         ResultSet rs;
 
+        System.out.println(data);
+
         //1 and 2 deal with users
         switch (type) {
             case 3:
                 //insert into note
-                ID = Integer.parseInt(dataArr[1].split("=")[1]);
-                title = "";
-                content = "";
-                ntype = Integer.parseInt(dataArr[4].split("=")[1]);
-                themeID = 1;
+                userID = Integer.parseInt(dataArr[counter++].split("=")[1]);
+                try {
+                    title = dataArr[counter++].split("=")[1];
+                } catch (Exception e) {
+                    title = "";
+                }
+                try {
+                    content = dataArr[counter++].split("=")[1];
+                } catch (Exception e) {
+                    content = "";
+                }
+                ntype = Integer.parseInt(dataArr[counter++].split("=")[1]);
+                themeID = Integer.parseInt(dataArr[counter++].split("=")[1]);
+                ID = Integer.parseInt(dataArr[counter++].split("=")[1]);
+                date = dataArr[counter].split("=")[1];
                 //2019-01-31
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDateTime now = LocalDateTime.now();
-                //System.out.println(dtf.format(now));
-                date = dtf.format(now);
+                //System.out.println(date);
+                if (date.equals("")) {
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDateTime now = LocalDateTime.now();
+                    //System.out.println(dtf.format(now));
+                    date = dtf.format(now);
+                }
 
-                sql = "insert into note (user_id, note_title, note_content, note_date, note_type, theme_id, note_id) values(?, ?, ?, ?, ?, ?, 0)";
-                stmnt = conn.prepareStatement(sql);
+                sql = "insert into note (user_id, note_title, note_content, note_date, note_type, theme_id, note_id) values(?, ?, ?, ?, ?, ?, ?)";
+                stmnt = conn.prepareStatement(sql, new String[]{"LOCAL_ID"});
 
-                stmnt.setInt(1, ID);
+                stmnt.setInt(1, userID);
                 stmnt.setString(2, title);
                 stmnt.setString(3, content);
                 stmnt.setString(4, date);
                 stmnt.setInt(5, ntype);
                 stmnt.setInt(6, themeID);
+                stmnt.setInt(7, ID);
 
                 stmnt.execute();
+
+                ResultSet key = stmnt.getGeneratedKeys();
+                int keyInt = 0;
+                while (key.next()) {
+                    keyInt += key.getInt(1);
+                }
+                queryResult = String.valueOf(keyInt);
                 break;
             case 4:
                 //get all notes from db
@@ -431,6 +525,8 @@ public class Database {
                 ntype = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 localID = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 sql = "update note set note_title = ?, note_content = ?, note_type = ?, note_id = ? where local_id = ?";
+
+                //System.out.println(title + "  " + content + "  " + ID + "  " + localID);
                 stmnt = conn.prepareStatement(sql);
 
                 stmnt.setString(1, title);
@@ -474,14 +570,23 @@ public class Database {
                 stmnt.setInt(1, themeID);
                 stmnt.setInt(2, ID);
                 break;
+            case 20:
+                sql = "insert into theme(prim_col, seco_col, text_col, hint_col, acce_col, but_col, theme_name) values (?,?,?,?,?,?,?)";
+                stmnt = conn.prepareStatement(sql);
+
+                stmnt.setString(counter, dataArr[counter++].split("=")[1]);
+                stmnt.setString(counter, dataArr[counter++].split("=")[1]);
+                stmnt.setString(counter, dataArr[counter++].split("=")[1]);
+                stmnt.setString(counter, dataArr[counter++].split("=")[1]);
+                stmnt.setString(counter, dataArr[counter++].split("=")[1]);
+                stmnt.setString(counter, dataArr[counter++].split("=")[1]);
+                stmnt.setString(counter, dataArr[counter].split("=")[1]);
+
+                stmnt.execute();
 
         }
 
         return queryResult;
-    }
-
-    private void themeUpdate() {
-
     }
 
     private String toVisualDate(String date, String s) {

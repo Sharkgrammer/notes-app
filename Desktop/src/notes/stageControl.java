@@ -44,7 +44,14 @@ public class stageControl {
     }
 
     public boolean closeStage(int ID) {
-        if (ID == noteID()) {
+        if (noteID() == 0){
+            if (ID == note.getLocal_id()){
+                stage.close();
+                return true;
+            }else{
+                return false;
+            }
+        }else if (ID == noteID()) {
             stage.close();
             return true;
         } else {
@@ -56,7 +63,11 @@ public class stageControl {
         if (note == null) {
             return 0;
         } else {
-            return note.getId();
+            if (note.getId() == 0){
+                return note.getLocal_id();
+            }else{
+                return note.getId();
+            }
         }
     }
 

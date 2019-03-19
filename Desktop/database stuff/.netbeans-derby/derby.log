@@ -1,7 +1,7 @@
-Wed Mar 13 20:44:33 GMT 2019 : Apache Derby Network Server - 10.10.2.0 - (1582446) started and ready to accept connections on port 1527
+Tue Mar 19 21:06:24 GMT 2019 : Apache Derby Network Server - 10.10.2.0 - (1582446) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Wed Mar 13 20:44:34 GMT 2019:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance a816c00e-0169-78cc-ae18-00004ccb6885 
+Tue Mar 19 21:06:25 GMT 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance a816c00e-0169-97c6-b3e6-00004ccb6885 
 on database directory C:\Users\gills\Documents\Notes\Desktop\database stuff\.netbeans-derby\notes with class loader sun.misc.Launcher$AppClassLoader@1d44bcfa 
 Loaded from file:/C:/Users/gills/Documents/Notes/Desktop/database%20stuff/javadb/lib/derby.jar
 java.vendor=Oracle Corporation
@@ -12,24 +12,7 @@ os.arch=amd64
 os.version=10.0
 derby.system.home=C:\Users\gills\Documents\Notes\Desktop\database stuff\.netbeans-derby
 Database Class Loader started - derby.database.classpath=''
-----------------------------------------------------------------
-Wed Mar 13 20:44:44 GMT 2019:
-Shutting down instance a816c00e-0169-78cc-ae18-00004ccb6885 on database directory C:\Users\gills\Documents\Notes\Desktop\database stuff\.netbeans-derby\notes with class loader sun.misc.Launcher$AppClassLoader@1d44bcfa 
-Wed Mar 13 20:44:44 GMT 2019 Thread[DRDAConnThread_2,5,main] (DATABASE = notes), (DRDAID = {2}), Database 'notes' shutdown.
-----------------------------------------------------------------
-Wed Mar 13 20:44:54 GMT 2019:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance 560740aa-0169-78cc-ae18-00004ccb6885 
-on database directory C:\Users\gills\Documents\Notes\Desktop\database stuff\.netbeans-derby\notes with class loader sun.misc.Launcher$AppClassLoader@1d44bcfa 
-Loaded from file:/C:/Users/gills/Documents/Notes/Desktop/database%20stuff/javadb/lib/derby.jar
-java.vendor=Oracle Corporation
-java.runtime.version=1.8.0_181-b13
-user.dir=C:\Users\gills\Documents\Notes\Desktop\database stuff\javadb
-os.name=Windows 10
-os.arch=amd64
-os.version=10.0
-derby.system.home=C:\Users\gills\Documents\Notes\Desktop\database stuff\.netbeans-derby
-Database Class Loader started - derby.database.classpath=''
-Wed Mar 13 22:11:00 GMT 2019 Thread[DRDAConnThread_9,5,main] Cleanup action starting
+Tue Mar 19 22:18:24 GMT 2019 Thread[DRDAConnThread_5,5,main] Cleanup action starting
 java.sql.SQLException: Database 'chocolateshop' not found.
 	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.getSQLException(Unknown Source)
 	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)
@@ -79,8 +62,8 @@ java.sql.SQLException: Database 'chocolateshop' not found.
 	at org.apache.derby.impl.drda.DRDAConnThread.run(Unknown Source)
 ============= end nested exception, level (1) ===========
 Cleanup action completed
-Wed Mar 13 22:11:00 GMT 2019 Thread[DRDAConnThread_9,5,main] (DATABASE = chocolateshop), (DRDAID = {100}), Database 'chocolateshop' not found.
-Wed Mar 13 22:11:00 GMT 2019 Thread[DRDAConnThread_7,5,main] Cleanup action starting
+Tue Mar 19 22:18:24 GMT 2019 Thread[DRDAConnThread_5,5,main] (DATABASE = chocolateshop), (DRDAID = {28}), Database 'chocolateshop' not found.
+Tue Mar 19 22:18:28 GMT 2019 Thread[DRDAConnThread_4,5,main] Cleanup action starting
 java.sql.SQLException: Database 'chocolateshop' not found.
 	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.getSQLException(Unknown Source)
 	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)
@@ -130,6 +113,4 @@ java.sql.SQLException: Database 'chocolateshop' not found.
 	at org.apache.derby.impl.drda.DRDAConnThread.run(Unknown Source)
 ============= end nested exception, level (1) ===========
 Cleanup action completed
-Wed Mar 13 22:11:00 GMT 2019 Thread[DRDAConnThread_7,5,main] (DATABASE = chocolateshop), (DRDAID = {101}), Database 'chocolateshop' not found.
-----------------------------------------------------------------
-Wed Mar 13 22:30:33 GMT 2019: Shutting down Derby engine
+Tue Mar 19 22:18:28 GMT 2019 Thread[DRDAConnThread_4,5,main] (DATABASE = chocolateshop), (DRDAID = {29}), Database 'chocolateshop' not found.

@@ -21,7 +21,9 @@ public class Notes extends Application {
         String temp = database.getKey();
         
         if (!temp.equals("")) {
-            themes = database.loadThemes();
+            if (themes == null) {
+                themes = database.loadThemes();
+            }
             user_id = Integer.parseInt(temp.split(";")[0]);
         }
     }
@@ -71,6 +73,12 @@ public class Notes extends Application {
         stage.setScene(new Scene((Parent) loader.load()));
 
         mainController controller = loader.<mainController>getController();
+        
+        if (note.getId() == 0 && note.getLocal_id() == 0){
+            Database database = new Database();
+            note.setLocal_id(database.addNoteLocal(note.getUser_id(), note.getTitle(), note.getContent(), note.getType(), note.getTheme_id(), note.getId(), note.getDate()));
+        }
+        
         stages.add(new stageControl(note, stage, controller));
         controller.start(note, stage);
 
