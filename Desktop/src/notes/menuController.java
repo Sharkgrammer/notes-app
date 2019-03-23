@@ -119,6 +119,7 @@ public class menuController implements Initializable {
         if (!notes.isEmpty()) {
             for (int x = notes.size() - 1; x >= 0; x--) {
                 note = notes.get(x);
+                //System.out.println(note.getId() + "  " + note.getLocal_id());
                 Label name2 = new Label(), date2 = new Label();
                 Pane clickPane2 = new Pane();
                 menuPane.getChildren().add(clickPane2);
@@ -168,7 +169,7 @@ public class menuController implements Initializable {
 
     private void noteClick(int ID, int mode) {
         try {
-            Theme theme = themes.get(notes.get(ID).getTheme_id() - 1);
+            Theme theme = themes.get(notes.get(ID).getTheme_id() - 1);            
             if (mode != 0) {
                 (new Notes()).makeStage(new Stage(), notes.get(ID), 0);
             }
@@ -275,6 +276,9 @@ public class menuController implements Initializable {
             stages.stream().forEach((x) -> {
                 x.close();
             });
+            if (!stages.isEmpty()){
+                stage.close();
+            }
         } else if (result.orElse(Not) == Min) {
             stage.setIconified(true);
         } else {

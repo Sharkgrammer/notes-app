@@ -143,7 +143,7 @@ public class mainController implements Initializable {
 
             stage.getIcons().add(new Image("assets/logo.png"));
             stage.show();
-            
+
             stage.setOnHiding(new EventHandler<WindowEvent>() {
 
                 @Override
@@ -160,6 +160,7 @@ public class mainController implements Initializable {
         //System.out.println("Option clicked");
         note.setContent(contentText.getText());
         note.setTitle(titleText.getText());
+        System.out.println(note.getLocal_id());
         database.updateNote(note);
         saved = true;
         runUpdates();
@@ -208,7 +209,12 @@ public class mainController implements Initializable {
             List<stageControl> list = Notes.stages;
 
             for (stageControl x : list) {
-                if (x.noteID() == note.getId()) {
+                if (note.getId() == 0) {
+                    if (x.noteID() == note.getLocal_id()) {
+                        list.remove(x);
+                        break;
+                    }
+                } else if (x.noteID() == note.getId()) {
                     list.remove(x);
                     break;
                 }

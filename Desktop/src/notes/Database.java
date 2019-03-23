@@ -448,16 +448,17 @@ public class Database {
                 ntype = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 themeID = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 ID = Integer.parseInt(dataArr[counter++].split("=")[1]);
-                date = dataArr[counter].split("=")[1];
-                //2019-01-31
-                //System.out.println(date);
-                if (date.equals("")) {
+                try{
+                    date = dataArr[counter].split("=")[1];
+                }catch(Exception e){
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     LocalDateTime now = LocalDateTime.now();
                     //System.out.println(dtf.format(now));
                     date = dtf.format(now);
                 }
 
+                //System.out.println(userID + " " + title + " " + content + " " + date + " " + ntype + " " + themeID + " " + ID);
+                
                 sql = "insert into note (user_id, note_title, note_content, note_date, note_type, theme_id, note_id) values(?, ?, ?, ?, ?, ?, ?)";
                 stmnt = conn.prepareStatement(sql, new String[]{"LOCAL_ID"});
 
@@ -569,6 +570,8 @@ public class Database {
                 stmnt = conn.prepareStatement(sql);
                 stmnt.setInt(1, themeID);
                 stmnt.setInt(2, ID);
+                
+                stmnt.execute();
                 break;
             case 20:
                 sql = "insert into theme(prim_col, seco_col, text_col, hint_col, acce_col, but_col, theme_name) values (?,?,?,?,?,?,?)";

@@ -21,7 +21,7 @@ public class stageControl {
         setStage(stage);
         setMenuCon(controller);
     }
-    
+
     public stageControl(Note note, Stage stage) {
         setNote(note);
         setStage(stage);
@@ -44,14 +44,7 @@ public class stageControl {
     }
 
     public boolean closeStage(int ID) {
-        if (noteID() == 0){
-            if (ID == note.getLocal_id()){
-                stage.close();
-                return true;
-            }else{
-                return false;
-            }
-        }else if (ID == noteID()) {
+        if (ID == noteID()) {
             stage.close();
             return true;
         } else {
@@ -62,12 +55,10 @@ public class stageControl {
     public int noteID() {
         if (note == null) {
             return 0;
+        } else if (note.getId() == 0) {
+            return note.getLocal_id();
         } else {
-            if (note.getId() == 0){
-                return note.getLocal_id();
-            }else{
-                return note.getId();
-            }
+            return note.getId();
         }
     }
 
@@ -78,11 +69,11 @@ public class stageControl {
     public void update() {
         if (mainCon != null) {
             mainCon.update(note);
-        } else if(menuCon != null) {
+        } else if (menuCon != null) {
             menuCon.update(passedByID);
         }
     }
-    
+
     public void close() {
         stage.close();
     }
@@ -102,7 +93,7 @@ public class stageControl {
     public void setMenuCon(menuController menuCon) {
         this.menuCon = menuCon;
     }
-    
+
     public void setPassedByID(int aPassedByID) {
         passedByID = aPassedByID;
     }

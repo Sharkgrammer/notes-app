@@ -15,11 +15,11 @@ public class Notes extends Application {
     private int user_id = 0;
     public static List<Theme> themes;
     public static List<stageControl> stages;
-    
-    public Notes(){
+
+    public Notes() {
         Database database = new Database();
         String temp = database.getKey();
-        
+
         if (!temp.equals("")) {
             if (themes == null) {
                 themes = database.loadThemes();
@@ -33,12 +33,12 @@ public class Notes extends Application {
         Database database = new Database();
         String temp = database.getKey();
         stages = new ArrayList<>();
-        
+
         if (temp.equals("")) {
             startUp(stage, null);
         } else {
             user_id = Integer.parseInt(temp.split(";")[0]);
-            
+
             List<Note> noteList = database.retrieveAllNotes(user_id);
             startUp(stage, noteList);
         }
@@ -56,29 +56,34 @@ public class Notes extends Application {
     void makeStage(Stage stage, Note note, int mode) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
         stage.initStyle(StageStyle.TRANSPARENT);
-        
-        if (mode != 0) {
+
+        if (mode != 0 && note.getId() != 0) {
             Database database = new Database();
             note.setId(database.addNote(user_id, "", "", 1));
         }
-        
-         for (stageControl x : stages){
-            if (note.getId() == x.noteID()){
+
+        if (note.getId() == 0 && note.getLocal_id() == 0) {
+            Database database = new Database();
+            note.setLocal_id(database.addNoteLocal(note.getUser_id(), note.getTitle(), note.getContent(), note.getType(), note.getTheme_id(), note.getId(), note.getDate()));
+        }
+
+        for (stageControl x : stages) {
+            if (note.getId() == 0) {
+                if (note.getLocal_id() == x.noteID()){
+                    x.setFocus();
+                    return;
+                }
+            } else if (note.getId() == x.noteID()) {
                 x.setFocus();
                 return;
             }
         }
-        
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         stage.setScene(new Scene((Parent) loader.load()));
 
         mainController controller = loader.<mainController>getController();
-        
-        if (note.getId() == 0 && note.getLocal_id() == 0){
-            Database database = new Database();
-            note.setLocal_id(database.addNoteLocal(note.getUser_id(), note.getTitle(), note.getContent(), note.getType(), note.getTheme_id(), note.getId(), note.getDate()));
-        }
-        
+
         stages.add(new stageControl(note, stage, controller));
         controller.start(note, stage);
 
@@ -96,7 +101,7 @@ public class Notes extends Application {
         menuController controller = loader.<menuController>getController();
         controller.start(notes, stage, user_id);
         stages.add(new stageControl(null, stage, controller));
-        
+
         stage.getIcons().add(new Image("assets/logo.png"));
         stage.show();
     }
