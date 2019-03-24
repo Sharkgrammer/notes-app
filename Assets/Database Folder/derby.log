@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Sun Mar 24 19:42:54 GMT 2019:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance a816c00e-0169-b13a-2ebf-ffff94c22b57 
+on database directory C:\Users\gills\Documents\JavaNotes\notes with class loader sun.misc.Launcher$AppClassLoader@55f96302 
+Loaded from file:/C:/Users/gills/Documents/Notes/Desktop/dist/run1620889328/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_181-b13
+user.dir=C:\Users\gills\Documents\Notes\Desktop
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=C:\Users\gills\Documents/JavaNotes
+Database Class Loader started - derby.database.classpath=''

@@ -17,7 +17,7 @@ public class Notes extends Application {
     public static List<stageControl> stages;
 
     public Notes() {
-        Database database = new Database();
+        Database database = new Database(1);
         String temp = database.getKey();
 
         if (!temp.equals("")) {
@@ -30,7 +30,7 @@ public class Notes extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Database database = new Database();
+        Database database = new Database(1);
         String temp = database.getKey();
         stages = new ArrayList<>();
 

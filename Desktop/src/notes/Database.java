@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import static java.lang.Runtime.getRuntime;
@@ -23,38 +22,65 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import javax.swing.filechooser.FileSystemView;
 
 public class Database {
 
     private final String USER_AGENT = "Mozilla/5.0", dir = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "/JavaNotes";
-    private final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
-    private final String DB_URL = "jdbc:derby://localhost:1527/notes";
-    private final String USER = "noteroot";
-    private final String PASS = "noteroot";
+    private final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+    private final String DB_URL = "jdbc:derby:notes;create=true";
     private Connection conn;
     private String key = "0";
     private final String url = "http://notesapp.gearhostpreview.com";
     private String modUrl = "notesapp.gearhostpreview.com";
 
     public Database() {
-        Path path = Paths.get(dir);
-        if (!Files.exists(path)) {
-            try {
-                Files.createDirectories(path);
-            } catch (IOException ex) {
-                System.out.println(ex.toString());
-            }
-        }
-
-        key = getKey();
-
         try {
             Class.forName(DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = DriverManager.getConnection(DB_URL);
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println(e.toString());
         }
+        key = getKey();
+    }
+    
+    public Database(int mode) {
+        Properties p = System.getProperties();
+        p.setProperty("derby.system.home", dir);
+        try {
+            Class.forName(DRIVER);
+            conn = DriverManager.getConnection(DB_URL);
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println(e.toString());
+        }
+        Path path = Paths.get(dir + "/keys");
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+                System.out.println("huh");
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
+
+            try {
+                //this is annoying but better then messing with stupid files for the time being
+                String createNote = "CREATE TABLE note (NOTE_ID INTEGER NOT NULL, USER_ID INTEGER NOT NULL, NOTE_TITLE LONG VARCHAR NOT NULL, NOTE_CONTENT LONG VARCHAR NOT NULL,"
+                        + "NOTE_DATE VARCHAR(30) NOT NULL, NOTE_TYPE VARCHAR(20) NOT NULL, THEME_ID VARCHAR(30) NOT NULL,"
+                        + "LOCAL_ID INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1))";
+                String createTheme = "CREATE TABLE THEME (THEME_ID INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), THEME_NAME VARCHAR(20) NOT NULL,"
+                        + "PRIM_COL VARCHAR(10) NOT NULL, SECO_COL VARCHAR(10) NOT NULL, "
+                        + "TEXT_COL VARCHAR(10) NOT NULL, HINT_COL VARCHAR(10) NOT NULL, ACCE_COL VARCHAR(10) NOT NULL, BUT_COL VARCHAR(20) NOT NULL)";
+
+                try (Statement currentStatement = conn.createStatement()) {
+                    currentStatement.execute(createNote);
+                    currentStatement.execute(createTheme);
+                }
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
+        }
+        key = getKey();
     }
 
     public String login(String email, String password) {
@@ -210,9 +236,9 @@ public class Database {
         String response = "";
         try {
             //response = sendPost(parms);
-            if (note.getId() == 0){
+            if (note.getId() == 0) {
                 response = sendLocal(parms);
-            }else{
+            } else {
                 response = sendPost(parms);
             }
         } catch (Exception ex) {
@@ -448,9 +474,9 @@ public class Database {
                 ntype = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 themeID = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 ID = Integer.parseInt(dataArr[counter++].split("=")[1]);
-                try{
+                try {
                     date = dataArr[counter].split("=")[1];
-                }catch(Exception e){
+                } catch (Exception e) {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     LocalDateTime now = LocalDateTime.now();
                     //System.out.println(dtf.format(now));
@@ -458,7 +484,6 @@ public class Database {
                 }
 
                 //System.out.println(userID + " " + title + " " + content + " " + date + " " + ntype + " " + themeID + " " + ID);
-                
                 sql = "insert into note (user_id, note_title, note_content, note_date, note_type, theme_id, note_id) values(?, ?, ?, ?, ?, ?, ?)";
                 stmnt = conn.prepareStatement(sql, new String[]{"LOCAL_ID"});
 
@@ -570,7 +595,7 @@ public class Database {
                 stmnt = conn.prepareStatement(sql);
                 stmnt.setInt(1, themeID);
                 stmnt.setInt(2, ID);
-                
+
                 stmnt.execute();
                 break;
             case 20:
@@ -617,7 +642,7 @@ public class Database {
     }
 
     private String accessKey(String key, boolean write) {
-        String fileName = dir + "/key.con";
+        String fileName = dir + "/keys/key.con";
         if (write) {
             try {
                 FileWriter fileWriter = new FileWriter(fileName);

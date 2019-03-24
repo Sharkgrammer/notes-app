@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\gills\Documents\Notes\Desktop\dist\Notes.jar</jar>
-  <outfile>C:\Users\gills\Documents\Notes\Application Files\Version 1\Notes.exe</outfile>
+  <outfile>C:\Users\gills\Documents\Notes\Application Files\Version 1.2\Notes.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
