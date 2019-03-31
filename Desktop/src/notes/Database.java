@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class Database {
     private String key = "0";
     private final String url = "http://notesapp.gearhostpreview.com";
     private String modUrl = "notesapp.gearhostpreview.com";
+    private boolean online = false, onlineCheck = false;
 
     public Database() {
         try {
@@ -44,7 +46,7 @@ public class Database {
         }
         key = getKey();
     }
-    
+
     public Database(int mode) {
         Properties p = System.getProperties();
         p.setProperty("derby.system.home", dir);
@@ -67,7 +69,7 @@ public class Database {
                 //this is annoying but better then messing with stupid files for the time being
                 String createNote = "CREATE TABLE note (NOTE_ID INTEGER NOT NULL, USER_ID INTEGER NOT NULL, NOTE_TITLE LONG VARCHAR NOT NULL, NOTE_CONTENT LONG VARCHAR NOT NULL,"
                         + "NOTE_DATE VARCHAR(30) NOT NULL, NOTE_TYPE VARCHAR(20) NOT NULL, THEME_ID VARCHAR(30) NOT NULL,"
-                        + "LOCAL_ID INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1))";
+                        + "LOCAL_ID INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), NOTE_CHANGED INT, NOTE_MOD VARCHAR(40))";
                 String createTheme = "CREATE TABLE THEME (THEME_ID INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), THEME_NAME VARCHAR(20) NOT NULL,"
                         + "PRIM_COL VARCHAR(10) NOT NULL, SECO_COL VARCHAR(10) NOT NULL, "
                         + "TEXT_COL VARCHAR(10) NOT NULL, HINT_COL VARCHAR(10) NOT NULL, ACCE_COL VARCHAR(10) NOT NULL, BUT_COL VARCHAR(20) NOT NULL)";
@@ -120,14 +122,15 @@ public class Database {
     }
 
     public int addNote(int user_id, String title, String content, int type) {
-        return addNote(user_id, title, content, type, false, 1, 0, "");
+        return addNote(user_id, title, content, type, false, 1, 0, "", 0, "");
     }
 
-    public int addNoteLocal(int user_id, String title, String content, int type, int theme, int note_id, String date) {
-        return addNote(user_id, title, content, type, true, theme, note_id, date);
+    public int addNoteLocal(Note note) {
+        return addNote(note.getUser_id(), note.getTitle(), note.getContent(), note.getType(), true,
+                note.getTheme_id(), note.getId(), note.getDate(), note.getChanged(), note.getModified());
     }
 
-    private int addNote(int user_id, String title, String content, int type, boolean local, int theme, int note_id, String date) {
+    private int addNote(int user_id, String title, String content, int type, boolean local, int theme, int note_id, String date, int changed, String modified) {
         List<String> parms = new ArrayList<>();
         parms.add("type");
         parms.add("3");
@@ -145,6 +148,10 @@ public class Database {
         parms.add(String.valueOf(note_id));
         parms.add("date");
         parms.add(date);
+        parms.add("changed");
+        parms.add(String.valueOf(changed));
+        parms.add("modifed");
+        parms.add(modified);
         String response = "";
         try {
             if (local) {
@@ -152,7 +159,6 @@ public class Database {
             } else {
                 response = sendPost(parms);
             }
-            //response = sendGet(parms);
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -161,6 +167,14 @@ public class Database {
     }
 
     public List<Note> retrieveAllNotes(int ID) {
+        return retrieveAllNotes(ID, false);
+    }
+
+    private List<Note> retrieveAllLocalNotes(int ID) {
+        return retrieveAllNotes(ID, true);
+    }
+
+    private List<Note> retrieveAllNotes(int ID, boolean local) {
         List<Note> noteList = new ArrayList<>();
         List<String> parms = new ArrayList<>();
         parms.add("type");
@@ -169,8 +183,12 @@ public class Database {
         parms.add(String.valueOf(ID));
         String response = "";
         try {
-            //response = sendPost(parms);
-            response = sendGet(parms);
+            if (local) {
+                response = sendLocal(parms);
+            } else {
+                onlineCheck = true;
+                response = sendGet(parms);
+            }
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -185,6 +203,8 @@ public class Database {
         int noteid = 0;
         for (String noteStr : response.split("/split2/")) {
             note = new Note();
+
+            System.out.println("NoteStr: " + noteStr);
             int notePointer = 0;
             String[] noteArr = noteStr.split("/split1/");
             note.setList_id(noteid++);
@@ -195,7 +215,10 @@ public class Database {
             note.setDate(toVisualDate(noteArr[notePointer++], "-"));
             note.setType(Integer.valueOf(noteArr[notePointer++]));
             note.setTheme_id(Integer.valueOf(noteArr[notePointer++]));
-            note.setLocal_id(addNoteLocal(note.getUser_id(), note.getTitle(), note.getContent(), note.getType(), note.getTheme_id(), note.getId(), note.getDate()));
+            System.out.println("Changed: " + noteArr[notePointer]);
+            note.setChanged(Integer.valueOf(noteArr[notePointer++]));
+            note.setModified(noteArr[notePointer++]);
+            note.setLocal_id(addNoteLocal(note));
             noteList.add(note);
         }
 
@@ -220,6 +243,7 @@ public class Database {
     }
 
     public void updateNote(Note note) {
+        System.out.println("halp with this update");
         List<String> parms = new ArrayList<>();
         parms.add("type");
         parms.add("6");
@@ -239,6 +263,7 @@ public class Database {
             if (note.getId() == 0) {
                 response = sendLocal(parms);
             } else {
+                System.out.println("halp with this update");
                 response = sendPost(parms);
             }
         } catch (Exception ex) {
@@ -324,9 +349,8 @@ public class Database {
     }
 
     private String sendPost(List<String> parms) throws Exception {
-        Process process = getRuntime().exec("ping " + modUrl);
-        int connected = process.waitFor();
-        if (connected != 0) {
+        if (!isOnline(parms)) {
+            System.out.println("sendPostLocal");
             return sendLocal(parms);
         }
 
@@ -370,9 +394,8 @@ public class Database {
     }
 
     private String sendGet(List<String> parms) throws Exception {
-        Process process = getRuntime().exec("ping " + modUrl);
-        int connected = process.waitFor();
-        if (connected != 0) {
+        if (!isOnline(parms)) {
+            System.out.println("sendGetLocal");
             return sendLocal(parms);
         }
 
@@ -413,6 +436,94 @@ public class Database {
         return response.toString();
     }
 
+    private boolean isOnline(List<String> parms) {
+        try {
+            Process process = getRuntime().exec("ping " + modUrl);
+            int connected = process.waitFor();
+            online = connected == 0;
+            System.out.println("Online: " + online);
+            System.out.println("OnlineCheck: " + onlineCheck);
+            if (onlineCheck && online) {
+                onlineCheck = false;
+                //checks are run here
+                String send = "", id = parms.get(3);
+
+                List<Note> noteList = retrieveAllLocalNotes(Integer.parseInt(id));
+
+                if (noteList.isEmpty()) {
+                    return online;
+                }
+
+                for (Note note : noteList) {
+                    if (note.getChanged() == 1) {
+                        send += note.getId() + ";";
+                    }
+                }
+
+                System.out.println("send " + send);
+
+                if (send.equals("")) {
+                    return online;
+                }
+
+                List<String> intparms = new ArrayList<String>();
+                intparms.add("type");
+                intparms.add("10");
+                intparms.add("ID");
+                intparms.add(id);
+                intparms.add("IDARR");
+                intparms.add(send);
+
+                String response = sendGet(intparms), sql;
+                
+                System.out.println(response);
+                
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                //sdf.parse("2014-01-16T10:25:00");
+                java.sql.Date resDate, noteDate;
+                PreparedStatement stmnt;
+
+                String[] respArr = response.split(";");
+                String[] noteIdArr = send.split(";");
+
+                for (int x = 0; x < respArr.length; x++) {
+                    resDate = new java.sql.Date(sdf.parse(respArr[x]).getTime());
+
+                    for (Note note : noteList) {
+                        if (note.getId() == Integer.parseInt(noteIdArr[x])) {
+                            noteDate = new java.sql.Date(sdf.parse(note.getModified()).getTime());
+
+                            if (resDate.compareTo(noteDate) >= 0) {
+                                //server updates local - reset changed to false
+                                sql = "update note set note_changed = ? where note_id = ?";
+                                stmnt = conn.prepareStatement(sql);
+                                stmnt.setInt(1, 0);
+                                stmnt.setInt(2, note.getId());
+                                stmnt.executeUpdate();
+                            } else {
+                                //local updates server
+                                updateNote(note);
+                                sql = "update note set note_changed = ? where note_id = ?";
+                                stmnt = conn.prepareStatement(sql);
+                                stmnt.setInt(1, 0);
+                                stmnt.setInt(2, note.getId());
+                                stmnt.executeUpdate();
+                            }
+                            
+                            break;
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+        return online;
+    }
+
     private void flushLocalDatabase(boolean note) {
         try {
             Statement query = conn.createStatement();
@@ -448,8 +559,8 @@ public class Database {
         }
 
         String[] dataArr = data.split("&");
-        int type = Integer.parseInt(dataArr[0].split("=")[1]), ntype, ID, themeID, userID, localID, counter = 1;
-        String queryResult = "", sql, title, content, date;
+        int type = Integer.parseInt(dataArr[0].split("=")[1]), ntype, ID, themeID, userID, localID, counter = 1, changed;
+        String queryResult = "", sql, title, content, date, modifed;
         PreparedStatement stmnt;
         Statement query;
         ResultSet rs;
@@ -460,6 +571,8 @@ public class Database {
         switch (type) {
             case 3:
                 //insert into note
+                System.out.println("insert run?");
+
                 userID = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 try {
                     title = dataArr[counter++].split("=")[1];
@@ -482,9 +595,11 @@ public class Database {
                     //System.out.println(dtf.format(now));
                     date = dtf.format(now);
                 }
+                changed = Integer.parseInt(dataArr[++counter].split("=")[1]);
+                modifed = dataArr[++counter].split("=")[1];
 
                 //System.out.println(userID + " " + title + " " + content + " " + date + " " + ntype + " " + themeID + " " + ID);
-                sql = "insert into note (user_id, note_title, note_content, note_date, note_type, theme_id, note_id) values(?, ?, ?, ?, ?, ?, ?)";
+                sql = "insert into note (user_id, note_title, note_content, note_date, note_type, theme_id, note_id, note_changed, note_mod) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 stmnt = conn.prepareStatement(sql, new String[]{"LOCAL_ID"});
 
                 stmnt.setInt(1, userID);
@@ -494,6 +609,8 @@ public class Database {
                 stmnt.setInt(5, ntype);
                 stmnt.setInt(6, themeID);
                 stmnt.setInt(7, ID);
+                stmnt.setInt(8, changed);
+                stmnt.setString(9, modifed);
 
                 stmnt.execute();
 
@@ -524,9 +641,14 @@ public class Database {
                     queryResult += "/split1/";
                     queryResult += rs.getInt("theme_id");
                     queryResult += "/split1/";
+                    queryResult += rs.getInt("note_changed");
+                    queryResult += "/split1/";
+                    queryResult += rs.getString("note_mod");
+                    queryResult += "/split1/";
                     queryResult += rs.getInt("local_id");
                     queryResult += "/split2/";
                 }
+                System.out.println(queryResult);
                 break;
             case 5:
                 //delete note via id
@@ -537,6 +659,7 @@ public class Database {
             case 6:
                 //update note
                 //type=6&ID=133&title=fff&content=fff&ntype=0&local=2424
+                System.out.println("update run?");
                 ID = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 try {
                     title = dataArr[counter++].split("=")[1];
@@ -550,7 +673,10 @@ public class Database {
                 }
                 ntype = Integer.parseInt(dataArr[counter++].split("=")[1]);
                 localID = Integer.parseInt(dataArr[counter++].split("=")[1]);
-                sql = "update note set note_title = ?, note_content = ?, note_type = ?, note_id = ? where local_id = ?";
+                java.util.Date dt = new java.util.Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String currentTime = sdf.format(dt);
+                sql = "update note set note_title = ?, note_content = ?, note_type = ?, note_id = ?, note_changed = ?, note_mod = ? where local_id = ?";
 
                 //System.out.println(title + "  " + content + "  " + ID + "  " + localID);
                 stmnt = conn.prepareStatement(sql);
@@ -559,7 +685,9 @@ public class Database {
                 stmnt.setString(2, content);
                 stmnt.setInt(3, ntype);
                 stmnt.setInt(4, ID);
-                stmnt.setInt(5, localID);
+                stmnt.setInt(5, 1);
+                stmnt.setString(6, currentTime);
+                stmnt.setInt(7, localID);
 
                 stmnt.executeUpdate();
                 break;

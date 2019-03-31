@@ -1,5 +1,4 @@
 <?php
-
 $creds = fgets(fopen("dbcreds.txt", "r")) or die("Unable to open file");
 
 $loc = explode(";", $creds)[0];
@@ -250,6 +249,10 @@ if ($type == 1){
 				echo $row['note_type'];
 				echo "/split1/";
 				echo $row['theme_id'];
+				echo "/split1/";
+				echo $row['note_changed'];
+				echo "/split1/";
+				echo $row['note_mod'];
 				echo "/split2/";
 			}
 		}
@@ -321,6 +324,71 @@ if ($type == 1){
 	$theme = $con->real_escape_string(htmlspecialchars($_POST['theme']));
 	$query = "update note set theme_id = '$theme' where note_id = '$note'";
 	mysqli_query($con, $query) or die(mysqli_error($con));
+}elseif($type == 9){
+	//Changed boop
+	
+	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
+	$query = "select note_id, note_changed from note where user_id = '$id' order by note_id";
+	$bool = false;
+	
+	$result = mysqli_query($con, $query) or die(mysqli_error($con));		
+	if(!$result)
+	{
+		echo 'Empty notes' . mysqli_error();
+	}
+	else
+	{
+		if(mysqli_num_rows($result) == 0)
+		{
+			echo "Error";
+		}
+		else
+		{
+			while($row = mysqli_fetch_assoc($result))
+			{
+				 if ($row['note_changed'] == 1){
+					$bool = true;
+					break;
+				 }
+			}
+		}
+	}
+	
+	echo $bool;
+	
+}elseif($type == 10){
+	//Local change handler
+	$id = $con->real_escape_string(htmlspecialchars($_GET['ID']));
+	$idarr = explode(";", $con->real_escape_string(htmlspecialchars($_GET['IDARR'])));
+	
+	$query = "select note_id, note_mod from note where user_id = '$id' order by note_id";
+	$bool = false;
+	
+	$result = mysqli_query($con, $query) or die(mysqli_error($con));		
+	if(!$result)
+	{
+		echo 'Empty notes' . mysqli_error();
+	}
+	else
+	{
+		if(mysqli_num_rows($result) == 0)
+		{
+			echo "Error";
+		}
+		else
+		{
+			while($row = mysqli_fetch_assoc($result))
+			{
+				$iddbstr = $row['note_id'];
+				foreach ($idarr as $idstr){
+					if ($iddbstr == $idstr){
+						echo $row['note_mod'] . ";";
+						break;
+					}
+				}
+			}
+		}
+	}
 }else{
 	echo "Authentication/Mismatch error";
 }

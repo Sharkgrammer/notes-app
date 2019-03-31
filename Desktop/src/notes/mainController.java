@@ -157,10 +157,9 @@ public class mainController implements Initializable {
 
     @FXML
     private void save(MouseEvent event) {
-        //System.out.println("Option clicked");
+        System.out.println("save clicked");
         note.setContent(contentText.getText());
         note.setTitle(titleText.getText());
-        System.out.println(note.getLocal_id());
         database.updateNote(note);
         saved = true;
         runUpdates();

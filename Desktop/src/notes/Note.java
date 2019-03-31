@@ -11,6 +11,8 @@ public class Note {
     private int type;
     private int theme_id;
     private int local_id;
+    private int changed;
+    private String modified;
 
     public Note() {
         id = 0;
@@ -21,6 +23,8 @@ public class Note {
         type = 0;
         theme_id = 1;
         local_id = 0;
+        changed = 0;
+        modified = "";
     }
 
     public int getId() {
@@ -128,5 +132,21 @@ public class Note {
 
     public void setLocal_id(int local_id) {
         this.local_id = local_id;
+    }
+
+    public int getChanged() {
+        return changed;
+    }
+
+    public void setChanged(int changed) {
+        this.changed = changed;
+    }
+
+    public String getModified() {
+        return modified;
+    }
+
+    public void setModified(String modified) {
+        this.modified = modified;
     }
 }

@@ -64,7 +64,7 @@ public class Notes extends Application {
 
         if (note.getId() == 0 && note.getLocal_id() == 0) {
             Database database = new Database();
-            note.setLocal_id(database.addNoteLocal(note.getUser_id(), note.getTitle(), note.getContent(), note.getType(), note.getTheme_id(), note.getId(), note.getDate()));
+            note.setLocal_id(database.addNoteLocal(note));
         }
 
         for (stageControl x : stages) {
