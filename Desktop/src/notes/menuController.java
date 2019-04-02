@@ -29,6 +29,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import static notes.Notes.initial;
+import static notes.Notes.online;
 import static notes.Notes.stages;
 
 public class menuController implements Initializable {

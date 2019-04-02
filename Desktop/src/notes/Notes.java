@@ -12,7 +12,8 @@ import javafx.stage.StageStyle;
 
 public class Notes extends Application {
 
-    private int user_id = 0;
+    public static int user_id = 0;
+    public static boolean initial = false, online;
     public static List<Theme> themes;
     public static List<stageControl> stages;
 
@@ -33,7 +34,6 @@ public class Notes extends Application {
         Database database = new Database(1);
         String temp = database.getKey();
         stages = new ArrayList<>();
-
         if (temp.equals("")) {
             startUp(stage, null);
         } else {
@@ -54,41 +54,47 @@ public class Notes extends Application {
     }
 
     void makeStage(Stage stage, Note note, int mode) throws Exception {
-        stage.initStyle(StageStyle.UNDECORATED);
-        stage.initStyle(StageStyle.TRANSPARENT);
-
-        if (mode != 0 && note.getId() != 0) {
+        if (mode != 0) {
             Database database = new Database();
             note.setId(database.addNote(user_id, "", "", 1));
         }
 
-        if (note.getId() == 0 && note.getLocal_id() == 0) {
+        if ((note.getId() == 0 && note.getLocal_id() == 0) || !online) {
             Database database = new Database();
             note.setLocal_id(database.addNoteLocal(note));
         }
 
-        for (stageControl x : stages) {
-            if (note.getId() == 0) {
-                if (note.getLocal_id() == x.noteID()){
+        if (stage != null) {
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.initStyle(StageStyle.TRANSPARENT);
+
+            for (stageControl x : stages) {
+                if (note.getId() == 0) {
+                    if (note.getLocal_id() == x.noteID()) {
+                        x.setFocus();
+                        return;
+                    }
+                } else if (note.getId() == x.noteID()) {
                     x.setFocus();
                     return;
                 }
-            } else if (note.getId() == x.noteID()) {
-                x.setFocus();
-                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
+            stage.setScene(new Scene((Parent) loader.load()));
+
+            mainController controller = loader.<mainController>getController();
+
+            stages.add(new stageControl(note, stage, controller));
+            controller.start(note, stage);
+
+            stage.getIcons().add(new Image("assets/logo.png"));
+            stage.show();
+        }else{
+            for (stageControl x : stages) {
+                x.update();
             }
         }
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
-        stage.setScene(new Scene((Parent) loader.load()));
-
-        mainController controller = loader.<mainController>getController();
-
-        stages.add(new stageControl(note, stage, controller));
-        controller.start(note, stage);
-
-        stage.getIcons().add(new Image("assets/logo.png"));
-        stage.show();
     }
 
     void startUp(Stage stage, List<Note> notes) throws Exception {
